@@ -93,6 +93,7 @@ select option { background:var(--surface); }
 .g-btn:hover { border-color:var(--orange); color:var(--text); }
 .g-btn.sel { border-color:var(--orange); background:#FF6B3520; color:var(--orange); }
 
+.g-btn.prim::after { content:"principal"; display:block; font-size:0.55rem; color:var(--teal); margin-top:0.15rem; letter-spacing:0.5px; }
 .focus-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:0.4rem; }
 .f-btn { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r-sm);
   padding:0.5rem 0.2rem; color:var(--muted); cursor:pointer; font-family:inherit;
@@ -253,11 +254,26 @@ select option { background:var(--surface); }
 
 /* ── V3: NÍVEIS, SESSÕES, RELÓGIO ───────────── */
 .sub-tab.blue.active { background:#60A5FA20; border-color:var(--blue); color:var(--blue); }
-.lvl-row { display:flex; align-items:center; gap:0.4rem; margin:-0.3rem 0 1rem; overflow-x:auto; scrollbar-width:none; }
-.lvl-lbl { font-size:0.65rem; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin-right:0.2rem; flex-shrink:0; }
-.lvl-chip { padding:0.3rem 0.7rem; border-radius:20px; border:1.5px solid var(--border); background:transparent;
-  color:var(--muted); font-family:inherit; font-size:0.68rem; font-weight:600; cursor:pointer; white-space:nowrap; transition:all 0.2s; }
+.lvl-row { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin:0 0 1.1rem; }
+.lvl-chip { padding:0.8rem 0.5rem; border-radius:var(--r-sm); border:1.5px solid var(--border); background:var(--surface);
+  color:var(--muted2); font-family:inherit; font-size:0.85rem; font-weight:600; cursor:pointer; transition:all 0.2s; }
 .lvl-chip.active { background:#A78BFA20; border-color:var(--purple); color:var(--purple); }
+.cat-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.65rem; margin-bottom:1rem; }
+.cat-card { position:relative; text-align:left; display:flex; flex-direction:column; gap:0.2rem; min-height:126px;
+  background:var(--card); border:1.5px solid var(--border); border-left:4px solid var(--cc, var(--orange));
+  border-radius:var(--r-md); padding:0.9rem 0.8rem; color:var(--text); font-family:inherit; cursor:pointer; transition:transform 0.15s, border-color 0.2s; }
+.cat-card:hover { border-color:var(--cc, var(--orange)); }
+.cat-card:active { transform:scale(0.98); }
+.cat-card.empty { opacity:0.45; }
+.cat-ic { font-size:1.9rem; line-height:1; }
+.cat-name { font-weight:700; font-size:0.98rem; margin-top:0.35rem; }
+.cat-desc { font-size:0.68rem; color:var(--muted); line-height:1.35; }
+.cat-count { font-size:0.68rem; color:var(--muted2); margin-top:auto; padding-top:0.4rem; }
+.cat-sel { position:absolute; top:0.55rem; right:0.55rem; font-size:0.6rem; font-weight:700; padding:0.15rem 0.5rem;
+  border-radius:20px; background:var(--cc, var(--orange)); color:#08081A; }
+.cat-bar { display:flex; align-items:center; gap:0.8rem; margin-bottom:1rem; }
+.cat-bar-title { font-family:'Bebas Neue',sans-serif; font-size:1.5rem; letter-spacing:1.5px; }
+.pane.collapsed { position:absolute; left:-9999px; top:0; width:min(560px, 92vw); }
 .ex-more { background:none; border:1.5px solid var(--border2); color:var(--muted2); width:22px; height:22px; border-radius:50%;
   font-family:inherit; font-size:0.68rem; font-weight:700; cursor:pointer; flex-shrink:0; }
 .ex-how { display:none; font-size:0.72rem; color:var(--muted2); line-height:1.5; margin-top:0.4rem; }
@@ -463,7 +479,8 @@ select option { background:var(--surface); }
 
     <!-- STEP 2: Objetivo -->
     <div class="ob-step" id="ob-step-2">
-      <div class="ob-step-title">🎯 Qual Seu Objetivo?</div>
+      <div class="ob-step-title">🎯 Quais Seus Objetivos?</div>
+      <div class="small muted" style="line-height:1.5;margin:-0.4rem 0 0.8rem">Escolha até 3. O <strong style="color:var(--text)">primeiro que você tocar</strong> é o principal e define suas calorias e seu cardápio.</div>
       <div class="goal-grid" id="goal-grid">
         <button class="g-btn" data-g="perder_peso"><span class="gi">⚡</span>Perder Peso</button>
         <button class="g-btn" data-g="perder_gordura"><span class="gi">🔥</span>Queimar Gordura</button>
@@ -568,6 +585,7 @@ select option { background:var(--surface); }
       </div>
 
       <!-- Coach tip -->
+      <div id="dash-checkin-wrap"></div>
       <div id="dash-coach-wrap"></div>
 
       <!-- Saúde do dia (smartwatch) -->
@@ -626,22 +644,18 @@ select option { background:var(--surface); }
     <!-- ── TREINO ── -->
     <div class="panel" id="p-treino">
       <div class="h1">Monte Seu Treino</div>
-      <div class="sub-tabs" id="cat-tabs">
-        <button class="sub-tab active" data-cat="forca"  onclick="switchEx('forca')">💪 Força</button>
-        <button class="sub-tab" data-cat="calist" onclick="switchEx('calist')">🤸 Calistenia</button>
-        <button class="sub-tab" data-cat="cardio" onclick="switchEx('cardio')">🏃 Cardio</button>
-        <button class="sub-tab purple" data-cat="danca" onclick="switchEx('danca')">💃 Dança</button>
-        <button class="sub-tab teal" data-cat="yoga" onclick="switchEx('yoga')">🧘 Yoga</button>
-        <button class="sub-tab blue" data-cat="taichi" onclick="switchEx('taichi')">☯️ Tai Chi</button>
-        <button class="sub-tab teal" data-cat="flexib" onclick="switchEx('flexib')">🙆 Flex.</button>
-        <button class="sub-tab" data-cat="hiit" style="color:var(--red)" onclick="switchEx('hiit')">⚡ HIIT</button>
-      </div>
+      <div class="section-sep" style="margin-top:0">Seu nível</div>
       <div class="lvl-row" id="lvl-row">
-        <span class="lvl-lbl">Nível</span>
-        <button class="lvl-chip active" data-l="all" onclick="setLevel('all')">Todos</button>
+        <button class="lvl-chip active" data-l="all" onclick="setLevel('all')">Todos os níveis</button>
         <button class="lvl-chip" data-l="iniciante" onclick="setLevel('iniciante')">🌱 Iniciante</button>
         <button class="lvl-chip" data-l="intermediario" onclick="setLevel('intermediario')">⭐ Intermediário</button>
         <button class="lvl-chip" data-l="avancado" onclick="setLevel('avancado')">🔥 Avançado</button>
+      </div>
+      <div class="section-sep" id="cat-title">Escolha a modalidade</div>
+      <div class="cat-grid" id="cat-grid"></div>
+      <div class="cat-bar" id="cat-bar" style="display:none">
+        <button class="btn btn-secondary btn-sm" onclick="showCats()">← Modalidades</button>
+        <span class="cat-bar-title" id="cat-bar-title"></span>
       </div>
       <div id="ex-forca"></div>
       <div id="ex-calist" style="display:none">
@@ -679,6 +693,33 @@ select option { background:var(--surface); }
     <!-- ── TIMER ── -->
     <div class="panel" id="p-timer">
       <div class="h1">⏱️ Timer de Treino</div>
+      <div class="sub-tabs" style="margin-bottom:0.8rem">
+        <button class="sub-tab" id="pb-mu" onclick="togglePane('mu')">🎵 Música</button>
+        <button class="sub-tab" id="pb-cfg" onclick="togglePane('cfg')">🔔 Avisos do treino</button>
+      </div>
+
+      <div class="pane collapsed" id="pane-mu">
+        <div class="card">
+          <div class="card-header"><span class="card-title">🎵 Música do treino</span></div>
+          <div id="mu-player"></div>
+          <div class="field"><label>Link da playlist (Spotify, YouTube ou YouTube Music)</label>
+            <input id="mu-link" type="url" placeholder="Cole o link aqui"></div>
+          <div style="display:flex;gap:0.5rem;margin-top:0.6rem">
+            <button class="btn btn-teal btn-sm" style="flex:1" onclick="saveMusic()">Salvar link</button>
+            <button class="btn btn-secondary btn-sm" onclick="clearMusic()">Remover</button>
+          </div>
+          <div class="tiny muted" id="mu-note" style="margin-top:0.7rem;line-height:1.6"></div>
+        </div>
+      </div>
+
+      <div class="pane collapsed" id="pane-cfg">
+        <div class="card">
+          <div class="card-header"><span class="card-title">🔔 Avisos do treino</span>
+            <button class="btn btn-secondary btn-sm" onclick="testarAvisos()">Testar</button></div>
+          <div id="t-cfg-list"></div>
+        </div>
+      </div>
+
       <div id="timer-empty" class="card" style="text-align:center;padding:2rem">
         <div style="font-size:3rem;margin-bottom:0.8rem">🏋️</div>
         <div class="muted small">Monte sua playlist em <strong style="color:var(--orange)">Treino</strong> e inicie aqui.</div>
@@ -964,9 +1005,9 @@ select option { background:var(--surface); }
 
 <!-- Overlays -->
 <div class="overlay" id="rest-overlay">
-  <div class="ov-big">DESCANSO</div>
+  <div class="ov-big" id="rest-label">DESCANSO</div>
   <div class="ov-num" id="rest-num">15</div>
-  <div class="ov-lbl">seg. até o próximo</div>
+  <div class="ov-lbl" id="rest-sub">seg. até o próximo</div>
   <div class="ov-lbl" id="rest-next" style="margin-top:0.6rem;text-transform:none;letter-spacing:0;color:var(--text)"></div>
   <button class="btn btn-teal" style="margin-top:1rem" onclick="skipRest()">Pular ⏭</button>
 </div>
@@ -1275,7 +1316,7 @@ function getCoachAdvice(user, history) {
 
   if(!last) return [
     '👋 Olá! Sou seu Coach IA. Registre seu primeiro check-in semanal para receber dicas personalizadas!',
-    `🎯 Seu objetivo é **${goalLabel(user.goal)}**. Vou te ajudar a chegar lá passo a passo.`,
+    `🎯 Seu${userGoals(user).length > 1 ? 's objetivos são' : ' objetivo é'} **${goalsText(user)}**. Vou te ajudar a chegar lá passo a passo.`,
     `💧 Sua meta diária de água é ${user.aguaMeta}mL. Comece hidratando bem!`,
   ];
 
@@ -1421,9 +1462,16 @@ function setObStep(n) {
   obStep = n;
 }
 
+let selGoals = [];   // ordem do toque = prioridade (o primeiro é o principal)
 document.querySelectorAll('.g-btn[data-g]').forEach(b => b.addEventListener('click', () => {
-  document.querySelectorAll('.g-btn[data-g]').forEach(x => x.classList.remove('sel'));
-  b.classList.add('sel');
+  const g = b.dataset.g;
+  if(selGoals.includes(g)) selGoals = selGoals.filter(x => x !== g);
+  else if(selGoals.length >= 3) { showNotif('🎯', 'Máximo de 3 objetivos', 'Toque em um já marcado para desmarcar.'); return; }
+  else selGoals.push(g);
+  document.querySelectorAll('.g-btn[data-g]').forEach(x => {
+    x.classList.toggle('sel', selGoals.includes(x.dataset.g));
+    x.classList.toggle('prim', selGoals[0] === x.dataset.g && selGoals.length > 1);
+  });
 }));
 document.querySelectorAll('.g-btn[data-n]').forEach(b => b.addEventListener('click', () => {
   document.querySelectorAll('.g-btn[data-n]').forEach(x => x.classList.remove('sel'));
@@ -1446,12 +1494,13 @@ function startApp() {
   const cintura = document.getElementById('i-cintura').value || '–';
   const quadril = document.getElementById('i-quadril').value || '–';
   const coxa    = document.getElementById('i-coxa').value || '–';
-  const goal    = document.querySelector('.g-btn[data-g].sel')?.dataset.g || 'saude';
+  const goals   = selGoals.length ? selGoals.slice() : ['saude'];
+  const goal    = goals[0];   // principal: define calorias e cardápio
   const nivel   = document.querySelector('.g-btn[data-n].sel')?.dataset.n || 'avancado';
   const diasSem = parseInt(document.querySelector('.g-btn[data-d].sel')?.dataset.d || '4');
   const focuses = [...document.querySelectorAll('.f-btn.sel')].map(b => b.dataset.f);
 
-  U = { nome, sexo, idade, altura, peso, gordura, braco, cintura, quadril, coxa, goal, nivel, diasSem, focuses };
+  U = { nome, sexo, idade, altura, peso, gordura, braco, cintura, quadril, coxa, goal, goals, nivel, diasSem, focuses };
   U.imc = +(peso / ((altura/100)**2)).toFixed(1);
   U.massaMagra = +(peso * (1 - gordura/100)).toFixed(1);
   U.kcalMeta = calcKcal(peso, altura, idade, sexo, goal);
@@ -1493,7 +1542,11 @@ function launch() {
   populateUI();
   renderExercises();
   renderSessions();
+  showCats();
   renderHR();
+  renderCheckinReminder();
+  renderCfg();
+  renderMusic();
   renderMeals();
   renderWater();
   renderReminders();
@@ -1546,7 +1599,7 @@ function populateUI() {
   document.getElementById('pf-avatar').textContent = emo;
   document.getElementById('pf-nome').textContent = U.nome;
   document.getElementById('pf-info').textContent = `${U.sexo==='F'?'Feminino':'Masculino'} · ${U.idade} anos · ${U.peso}kg · ${U.altura}cm`;
-  document.getElementById('pf-obj').textContent = goalLabel(U.goal);
+  document.getElementById('pf-obj').textContent = goalsText(U);
   document.getElementById('pf-imc').textContent = U.imc;
   document.getElementById('pf-imc-lbl').textContent = imcL;
   document.getElementById('pf-imc-lbl').style.color = imcC;
@@ -1632,6 +1685,50 @@ function renderExercises() {
       wrap.appendChild(div);
     });
   });
+  renderCatGrid();
+}
+
+const CAT_META = {
+  forca:  {icon:'💪', name:'Força',            color:'var(--orange)', desc:'Braços, peito, pernas, glúteos e core'},
+  calist: {icon:'🤸', name:'Calistenia',       color:'var(--yellow)', desc:'Flexões, barras e progressões'},
+  cardio: {icon:'🏃', name:'Cardio',           color:'var(--pink)',   desc:'Queime calorias e ganhe fôlego'},
+  danca:  {icon:'💃', name:'Dança',            color:'var(--purple)', desc:'Forró, funk, samba, zumba…'},
+  yoga:   {icon:'🧘', name:'Yoga',             color:'var(--teal)',   desc:'Postura, equilíbrio e calma'},
+  taichi: {icon:'☯️', name:'Tai Chi na Cadeira', color:'var(--blue)', desc:'Movimentos lentos, sentado e seguro'},
+  flexib: {icon:'🙆', name:'Flexibilidade',    color:'var(--green)',  desc:'Alongar, soltar e ganhar mobilidade'},
+  hiit:   {icon:'⚡', name:'HIIT',             color:'var(--red)',    desc:'Alta intensidade em pouco tempo'},
+};
+
+function renderCatGrid() {
+  const g = document.getElementById('cat-grid');
+  if(!g) return;
+  g.innerHTML = ALL_CATS.map(cat => {
+    const m = CAT_META[cat];
+    const n = (EX[cat] || []).filter(levelOk).length;
+    const ses = NEW_CATS.includes(cat) ? SESSIONS.filter(x => x.cat === cat && (lvlFilter === 'all' || x.level === lvlFilter)).length : 0;
+    const sel = playlist.filter(p => p.cat === cat).length;
+    const cnt = n ? `${n} exercício${n > 1 ? 's' : ''}${ses ? ` · ${ses} ${ses > 1 ? 'sessões' : 'sessão'}` : ''}` : 'Nenhum neste nível';
+    return `<button class="cat-card ${n ? '' : 'empty'}" style="--cc:${m.color}" onclick="switchEx('${cat}')">
+      ${sel ? `<span class="cat-sel">${sel} na playlist</span>` : ''}
+      <span class="cat-ic">${m.icon}</span><span class="cat-name">${m.name}</span>
+      <span class="cat-desc">${m.desc}</span><span class="cat-count">${cnt}</span></button>`;
+  }).join('');
+}
+
+function topoDaTela() { window.scrollTo(0, 0); const c = document.querySelector('.content'); if(c) c.scrollTop = 0; }
+
+function showCats() {
+  currentEx = null;
+  ALL_CATS.forEach(c => {
+    const a = document.getElementById('ex-' + c), b = document.getElementById('ex-list-' + c);
+    if(a) a.style.display = 'none';
+    if(b) b.style.display = 'none';
+  });
+  document.getElementById('cat-grid').style.display = 'grid';
+  document.getElementById('cat-title').style.display = 'block';
+  document.getElementById('cat-bar').style.display = 'none';
+  renderCatGrid();
+  topoDaTela();
 }
 
 function setLevel(l) {
@@ -1690,13 +1787,17 @@ function toggleEx(ex, cat) {
 
 function switchEx(cat) {
   currentEx = cat;
+  document.getElementById('cat-grid').style.display = 'none';
+  document.getElementById('cat-title').style.display = 'none';
+  document.getElementById('cat-bar').style.display = 'flex';
+  document.getElementById('cat-bar-title').textContent = CAT_META[cat].icon + ' ' + CAT_META[cat].name;
   ALL_CATS.forEach(c => {
     const el  = document.getElementById('ex-list-' + c);
     const tip = document.getElementById('ex-' + c);
     if(el)  el.style.display  = c === cat ? 'block' : 'none';
     if(tip) tip.style.display = c === cat ? 'block' : 'none';
   });
-  document.querySelectorAll('#cat-tabs .sub-tab').forEach(t => t.classList.toggle('active', t.dataset.cat === cat));
+  topoDaTela();
 }
 
 function updatePlaylistBar() {
@@ -1738,8 +1839,9 @@ function initTimer() {
   document.getElementById('timer-active').style.display = 'block';
   timerQ = playlist.map(p => ({...p}));
   timerIdx = 0; timerRunning = false;
-  wkt = {activeSec:0, bpm:[], done:false};
-  clearInterval(timerIv);
+  wkt = {activeSec:0, bpm:[], done:false, started:false};
+  clearInterval(timerIv); clearInterval(restIv);
+  document.getElementById('rest-overlay').classList.remove('show');
   loadEx(0);
   renderHR();
 }
@@ -1763,56 +1865,153 @@ function loadEx(i) {
   renderQueue();
 }
 
+let tEnd = 0, phaseEnd = 0, phaseDone = null, flashTO = null;
+
+function flashPhase(txt) {
+  const el = document.getElementById('t-phase');
+  const ex = timerQ[timerIdx];
+  const base = ((ex && CAT_INFO[ex.cat]) || CAT_INFO.forca).phase;
+  el.textContent = txt;
+  clearTimeout(flashTO);
+  flashTO = setTimeout(() => { if(!wkt.done) el.textContent = base; }, 2500);
+}
+
+// "3x10" -> "3 séries de 10" (para a voz ler direito)
+function falaSets(t) {
+  return String(t)
+    .replace(/(\d+)x(\d+)s\b/g, '$1 séries de $2 segundos')
+    .replace(/(\d+)x(\d+)m\b/g, '$1 séries de $2 metros')
+    .replace(/(\d+)x(\d+)/g, '$1 séries de $2')
+    .replace(/(\d+)min\b/g, '$1 minutos')
+    .replace(/(\d+)s\b/g, '$1 segundos')
+    .replace(/(\d+)\s*rep\b/g, '$1 repetições');
+}
+
+function anunciar(ex, prefixo) {
+  if(!ex) return;
+  say(`${prefixo} ${ex.name}. ${falaSets(ex.sets)}.` + (CFG.explica && ex.how ? ' ' + ex.how : ''));
+}
+
 function toggleTimer() {
   if(wkt.done) { initTimer(); return; }   // 🔄 depois de terminar = recomeçar
-  if(timerRunning) {
-    timerRunning = false; clearInterval(timerIv); keepAwake(false);
-    document.getElementById('t-playpause').textContent = '▶';
-  } else {
-    timerRunning = true; keepAwake(true);
-    document.getElementById('t-playpause').textContent = '⏸';
-    timerIv = setInterval(() => {
-      timerSec--; wkt.activeSec++;
-      document.getElementById('t-time').textContent = fmtTime(timerSec);
-      updateRing(timerSec, timerTotal);
-      if(timerSec <= 0) {
-        clearInterval(timerIv); timerRunning = false;
-        if(timerIdx < timerQ.length - 1) beginRest();
-        else finishWorkout();
-      }
-    }, 1000);
+  audioInit();                            // o navegador só libera o som depois de um toque
+  if(timerRunning) { pauseTimer(); return; }
+  if(!wkt.started) {
+    wkt.started = true;
+    const ex = timerQ[timerIdx];
+    beginPhase(5, 'PREPARE-SE', 'seg. para começar', ex, () => {
+      beep(1320, 0.3); vibra(200); anunciar(ex, 'Vamos!'); runExercise();
+    }, `Prepare-se. Primeiro exercício: ${ex.name}.`);
+    return;
+  }
+  runExercise();
+}
+
+function pauseTimer() {
+  clearInterval(timerIv); timerRunning = false;
+  timerSec = Math.max(0, Math.ceil((tEnd - Date.now()) / 1000));
+  document.getElementById('t-playpause').textContent = '▶';
+  keepAwake(false);
+  try { speechSynthesis.cancel(); } catch(e) {}
+}
+
+function runExercise() {
+  timerRunning = true; keepAwake(true);
+  document.getElementById('t-playpause').textContent = '⏸';
+  tEnd = Date.now() + timerSec * 1000;     // conta pelo relógio: não atrasa se o celular "segurar" o app
+  clearInterval(timerIv);
+  timerIv = setInterval(tick, 250);
+}
+
+function tick() {
+  const left = Math.max(0, Math.ceil((tEnd - Date.now()) / 1000));
+  if(left !== timerSec) {
+    wkt.activeSec += Math.max(0, timerSec - left);
+    timerSec = left;
+    document.getElementById('t-time').textContent = fmtTime(left);
+    updateRing(left, timerTotal);
+    if(left > 0) avisosDoTempo(left);
+  }
+  if(left <= 0) {
+    clearInterval(timerIv); timerRunning = false;
+    beep(1320, 0.5, 0.5); vibra([250, 100, 250]);
+    if(timerIdx < timerQ.length - 1) beginRest(); else finishWorkout();
   }
 }
 
-function beginRest() {
-  const cur = timerQ[timerIdx], nxt = timerQ[timerIdx + 1];
-  restSec = (CAT_INFO[cur.cat] || CAT_INFO.forca).rest;
-  document.getElementById('rest-next').textContent = nxt ? 'Próximo: ' + nxt.icon + ' ' + nxt.name : '';
-  const ov = document.getElementById('rest-overlay');
-  ov.classList.add('show');
-  document.getElementById('rest-num').textContent = restSec;
-  restIv = setInterval(() => {
-    restSec--;
-    document.getElementById('rest-num').textContent = restSec;
-    if(restSec <= 0) skipRest();
-  }, 1000);
+function avisosDoTempo(left) {
+  const ex = timerQ[timerIdx], dur = timerTotal;
+  if(left <= 3) { beep(880, 0.12); return; }               // 3, 2, 1
+  if(left === Math.floor(dur / 2) && dur >= 45) {          // metade do tempo
+    if(/cada/i.test(ex.sets)) {
+      flashPhase('🔄 TROQUE DE LADO');
+      beep(660, 0.15); setTimeout(() => beep(660, 0.15), 220); vibra([150, 80, 150]);
+      say('Troque de lado');
+    } else {
+      flashPhase('⏳ METADE DO TEMPO');
+      beep(660, 0.15); say('Metade do tempo');
+    }
+    return;
+  }
+  if(left === 10 && dur >= 40) { flashPhase('⏱️ 10 SEGUNDOS'); say('Faltam dez segundos'); }
 }
 
-function skipRest() {
+// Tela cheia de "Prepare-se" e "Descanso" (contagem também pelo relógio)
+function beginPhase(sec, label, sub, nextEx, onDone, fala) {
+  clearInterval(restIv);
+  phaseDone = onDone; phaseEnd = Date.now() + sec * 1000; restSec = sec;
+  document.getElementById('rest-label').textContent = label;
+  document.getElementById('rest-sub').textContent = sub;
+  document.getElementById('rest-next').textContent = nextEx ? 'Próximo: ' + nextEx.icon + ' ' + nextEx.name : '';
+  document.getElementById('rest-num').textContent = sec;
+  document.getElementById('rest-overlay').classList.add('show');
+  say(fala);
+  restIv = setInterval(() => {
+    const left = Math.max(0, Math.ceil((phaseEnd - Date.now()) / 1000));
+    if(left !== restSec) {
+      restSec = left;
+      document.getElementById('rest-num').textContent = left;
+      if(left > 0 && left <= 3) beep(880, 0.12);
+    }
+    if(left <= 0) endPhase();
+  }, 250);
+}
+
+function endPhase() {
   clearInterval(restIv);
   document.getElementById('rest-overlay').classList.remove('show');
-  timerIdx++;
-  loadEx(timerIdx);
+  const cb = phaseDone; phaseDone = null;
+  if(cb) cb();
+}
+
+function skipRest() { endPhase(); }
+
+function beginRest() {
+  const cur = timerQ[timerIdx], nxt = timerQ[timerIdx + 1];
+  const seg = (CAT_INFO[cur.cat] || CAT_INFO.forca).rest;
+  beginPhase(seg, 'DESCANSO', 'seg. até o próximo', nxt, () => {
+    timerIdx++; loadEx(timerIdx);
+    beep(1320, 0.3); vibra(200); anunciar(nxt, 'Vamos!');
+    runExercise();                          // o próximo exercício começa sozinho
+  }, `Descanso. Próximo: ${nxt.name}.`);
 }
 
 function timerNext() {
+  const was = timerRunning;
   clearInterval(timerIv); timerRunning = false;
-  if(timerIdx < timerQ.length - 1) { timerIdx++; loadEx(timerIdx); }
+  if(timerIdx < timerQ.length - 1) {
+    timerIdx++; loadEx(timerIdx);
+    if(was) { anunciar(timerQ[timerIdx], 'Próximo:'); runExercise(); }
+  }
 }
 
 function timerPrev() {
+  const was = timerRunning;
   clearInterval(timerIv); timerRunning = false;
-  if(timerIdx > 0) { timerIdx--; loadEx(timerIdx); }
+  if(timerIdx > 0) {
+    timerIdx--; loadEx(timerIdx);
+    if(was) { anunciar(timerQ[timerIdx], 'Voltando:'); runExercise(); }
+  }
 }
 
 function updateRing(cur, tot) {
@@ -1887,14 +2086,22 @@ function finishWorkout() {
   populateUI();
   renderHealth();
   showNotif('🎉','Treino Concluído!', `+50 XP · ~${kcal} kcal` + (avg ? ` · ❤️ ${avg} bpm` : '') + '. Agora beba água e descanse.');
+  beep(880, 0.2); setTimeout(() => beep(1100, 0.2), 250); setTimeout(() => beep(1320, 0.4), 500);
+  vibra([300, 100, 300, 100, 500]);
+  say(`Treino concluído! Parabéns, ${U.nome}! Agora beba água e alongue.`);
 }
 
 // Mantém a tela ligada durante o treino (senão o celular apaga e a conexão com o relógio pode cair)
 async function keepAwake(on) {
   try {
-    if(on && 'wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen');
-    else if(wakeLock) { await wakeLock.release(); wakeLock = null; }
-  } catch(e) {}
+    if(on) {
+      if(wakeLock || !('wakeLock' in navigator)) return;
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', () => { wakeLock = null; });
+    } else if(wakeLock) {
+      const w = wakeLock; wakeLock = null; await w.release();
+    }
+  } catch(e) { wakeLock = null; }
 }
 document.addEventListener('visibilitychange', () => {
   if(document.visibilityState === 'visible' && timerRunning) keepAwake(true);
@@ -2365,6 +2572,19 @@ function renderLineChart(containerId, datasets, labels, colors) {
 }
 
 // ── PROGRESS / CHECK-IN ────────────────────────
+function renderCheckinReminder() {
+  const el = document.getElementById('dash-checkin-wrap');
+  if(!el) return;
+  const h = DB.load('history', []);
+  const last = h.length ? h[h.length - 1].timestamp : (U.createdAt ? new Date(U.createdAt).getTime() : Date.now());
+  const dias = Math.floor((Date.now() - last) / 86400000);
+  if(dias < 7) { el.innerHTML = ''; return; }
+  el.innerHTML = `<div class="card" style="border-color:var(--orange);background:linear-gradient(135deg,#FF6B3515,var(--card))">
+    <div class="card-title">📝 Hora do check-in semanal</div>
+    <div class="small muted" style="margin:0.4rem 0 0.8rem;line-height:1.5">${h.length ? `Faz ${dias} dias desde o último registro de peso e medidas.` : `Faz ${dias} dias que você começou e ainda não registrou peso e medidas.`}</div>
+    <button class="btn btn-primary" style="padding:0.7rem" onclick="nav('progresso')">Fazer agora · +30 XP</button></div>`;
+}
+
 function saveCheckin() {
   const ci = {
     date: new Date().toLocaleDateString('pt-BR'),
@@ -2395,6 +2615,7 @@ function saveCheckin() {
 
   checkAchievements();
   renderProgress();
+  renderCheckinReminder();
   renderCoach();
   populateUI();
   showNotif('✅','Check-in Salvo!',`+30 XP · Semana registrada com sucesso!`);
@@ -2516,16 +2737,17 @@ function renderCoach() {
   else ageAdj = '✅ Faixa etária ideal para progressão. Seja consistente e aumente a carga gradualmente.';
 
   const goalAdj = {
-    perder_peso: `🔥 Déficit de ~450 kcal/dia. Meta: ${U.kcalMeta} kcal. 3-4 sessões de cardio + 2-3 de força.`,
+    perder_peso: U.goal === 'perder_peso' ? `🔥 Déficit de ~450 kcal/dia. Meta: ${U.kcalMeta} kcal. 3-4 sessões de cardio + 2-3 de força.` : '🔥 Perder peso: 3-4 sessões de cardio + 2-3 de força por semana.',
     perder_gordura: `💪 Proteínas altas (~${Math.round(U.peso*1.8)}g/dia). Cardio moderado + musculação para preservar músculo.`,
-    ganhar_massa: `📈 Superávit de ~450 kcal. Meta: ${U.kcalMeta} kcal. Progressão de carga a cada 2 semanas.`,
+    ganhar_massa: U.goal === 'ganhar_massa' ? `📈 Superávit de ~450 kcal. Meta: ${U.kcalMeta} kcal. Progressão de carga a cada 2 semanas.` : '📈 Ganhar massa: priorize proteína e aumente a carga a cada 2 semanas.',
     definir: `⚡ Fase de definição: manter proteínas, reduzir carbo simples. Treinos circulares.`,
     saude: `❤️ 150min/semana de atividade moderada. Misture cardio, força e flexibilidade.`,
     flexibilidade: `🧘 Alongamentos 3x/semana mínimo. Yoga e pilates são excelentes complementos.`,
   };
 
   document.getElementById('coach-adjustments').innerHTML =
-    `<div style="margin-bottom:0.6rem;line-height:1.7">${goalAdj[U.goal]||''}</div>
+    `<div style="margin-bottom:0.6rem;line-height:1.7">${userGoals(U).map(g => goalAdj[g]||'').filter(Boolean).join('<br><br>')}</div>
+     ${conflitoObjetivos(U) ? '<div style="margin-bottom:0.6rem;line-height:1.7;color:var(--orange2)">⚖️ Perder gordura e ganhar massa ao mesmo tempo funciona melhor com proteína alta e treino de força. Suas calorias seguem o objetivo principal.</div>' : ''}
      <div style="line-height:1.7;color:var(--muted2)">${ageAdj}</div>`;
 
   // Also show in dashboard
@@ -2562,6 +2784,153 @@ function resetAll() {
 function goalLabel(g) {
   return {perder_peso:'Perder Peso',perder_gordura:'Queimar Gordura',ganhar_massa:'Ganhar Massa',
     definir:'Definir Corpo',saude:'Saúde Geral',flexibilidade:'Flexibilidade'}[g] || g;
+}
+function userGoals(u) { return (u.goals && u.goals.length) ? u.goals : [u.goal]; }
+function goalsText(u) { return userGoals(u).map(goalLabel).join(' + '); }
+function conflitoObjetivos(u) {
+  const g = userGoals(u);
+  return g.includes('ganhar_massa') && (g.includes('perder_peso') || g.includes('perder_gordura'));
+}
+
+// ── AVISOS DO TREINO: bipes, voz do treinador e vibração ──
+const CFG_PADRAO = {som:true, voz:true, vibra:true, explica:false};
+let CFG = {...CFG_PADRAO, ...DB.load('cfg', {})};
+let audioCtx = null;
+
+function audioInit() {
+  try {
+    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+  } catch(e) {}
+}
+
+function beep(freq = 880, dur = 0.14, vol = 0.4) {
+  if(!CFG.som || !audioCtx) return;
+  try {
+    const t = audioCtx.currentTime, o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = 'sine'; o.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(t); o.stop(t + dur + 0.02);
+  } catch(e) {}
+}
+
+function say(text) {
+  if(!CFG.voz || !('speechSynthesis' in window)) return;
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'pt-BR'; u.rate = 1.03;
+    const v = speechSynthesis.getVoices().find(x => /^pt[-_]BR/i.test(x.lang));
+    if(v) u.voice = v;
+    speechSynthesis.speak(u);
+  } catch(e) {}
+}
+
+function vibra(p) { if(CFG.vibra && navigator.vibrate) { try { navigator.vibrate(p); } catch(e) {} } }
+
+const CFG_ITENS = [
+  ['som',     '🔊', 'Bipes',                   'Contagem 3-2-1 e aviso de troca'],
+  ['voz',     '🗣️', 'Voz do treinador',        'Anuncia o próximo exercício e o tempo'],
+  ['vibra',   '📳', 'Vibração',                'Vibra ao trocar de exercício (Android)'],
+  ['explica', '📖', 'Explicar cada exercício', 'Lê o "como fazer" em voz alta'],
+];
+
+function renderCfg() {
+  const el = document.getElementById('t-cfg-list');
+  if(!el) return;
+  el.innerHTML = CFG_ITENS.map(([k, ic, nome, desc]) => `
+    <div style="display:flex;align-items:center;gap:0.9rem;padding:0.7rem 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:1.3rem">${ic}</span>
+      <div style="flex:1"><div style="font-size:0.85rem;font-weight:600">${nome}</div><div class="tiny muted">${desc}</div></div>
+      <label class="toggle"><input type="checkbox" ${CFG[k] ? 'checked' : ''} onchange="setCfg('${k}', this.checked)"><div class="toggle-track"></div></label>
+    </div>`).join('');
+  el.lastElementChild.style.borderBottom = 'none';
+}
+
+function setCfg(k, v) { CFG[k] = v; DB.save('cfg', CFG); if(v) audioInit(); }
+
+function testarAvisos() {
+  audioInit();
+  beep(880, 0.15); setTimeout(() => beep(1320, 0.3), 250);
+  vibra([120, 60, 120]);
+  say('Avisos ligados. Bora treinar!');
+}
+
+function togglePane(id) {
+  const p = document.getElementById('pane-' + id);
+  const on = p.classList.contains('collapsed');
+  p.classList.toggle('collapsed', !on);
+  document.getElementById('pb-' + id).classList.toggle('active', on);
+}
+
+// ── MÚSICA DO TREINO: link do Spotify, YouTube ou YouTube Music ──
+function parseMusic(url) {
+  url = (url || '').trim();
+  const sp = url.match(/open\.spotify\.com\/(?:intl-[a-z]+\/)?(playlist|album|track|artist|show|episode)\/([A-Za-z0-9]+)/i)
+          || url.match(/^spotify:(playlist|album|track|artist|show|episode):([A-Za-z0-9]+)/i);
+  if(sp) {
+    const kind = sp[1].toLowerCase();
+    return {type:'spotify', kind, id:sp[2], url:`https://open.spotify.com/${kind}/${sp[2]}`};
+  }
+  if(/(youtube\.com|youtu\.be)/i.test(url)) {
+    const list  = (url.match(/[?&]list=([A-Za-z0-9_-]+)/) || [])[1];
+    const video = (url.match(/[?&]v=([A-Za-z0-9_-]{11})/) || url.match(/youtu\.be\/([A-Za-z0-9_-]{11})/) || [])[1];
+    const music = /music\.youtube\.com/i.test(url);
+    const host  = music ? 'music.youtube.com' : 'www.youtube.com';
+    if(video) return {type:'youtube', music, video, list, url:`https://${host}/watch?v=${video}` + (list ? `&list=${list}` : '')};
+    if(list)  return {type:'youtube', music, list, url:`https://${host}/playlist?list=${list}`};
+  }
+  return null;
+}
+
+function saveMusic() {
+  const m = parseMusic(document.getElementById('mu-link').value);
+  if(!m) { showNotif('⚠️', 'Link não reconhecido', 'Use um link de playlist do Spotify, YouTube ou YouTube Music.'); return; }
+  DB.save('music', m);
+  renderMusic();
+  showNotif('🎵', 'Música salva', 'Toque em play no player antes de iniciar o treino.');
+}
+
+function clearMusic() { DB.remove('music'); document.getElementById('mu-link').value = ''; renderMusic(); }
+
+function abrirMusica() {
+  const m = DB.load('music', null);
+  if(m) window.open(m.url, '_blank', 'noopener');
+}
+
+function mostrarSpotify() {
+  const m = DB.load('music', null);
+  if(!m || m.type !== 'spotify') return;
+  document.getElementById('mu-embed').innerHTML =
+    `<iframe style="border-radius:12px;border:0" src="https://open.spotify.com/embed/${m.kind}/${m.id}?utm_source=generator&theme=0" width="100%" height="152" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+}
+
+function renderMusic() {
+  const box = document.getElementById('mu-player'), note = document.getElementById('mu-note');
+  if(!box) return;
+  const m = DB.load('music', null);
+  if(!m) {
+    box.innerHTML = '';
+    note.textContent = 'Cole o link de uma playlist e ela fica salva aqui para todos os treinos.';
+    return;
+  }
+  document.getElementById('mu-link').value = m.url;
+  if(m.type === 'youtube') {
+    const src = m.video
+      ? `https://www.youtube.com/embed/${m.video}?playsinline=1` + (m.list ? `&list=${m.list}` : '')
+      : `https://www.youtube.com/embed/videoseries?list=${m.list}&playsinline=1`;
+    box.innerHTML = `<button class="btn btn-teal" style="width:100%;margin-bottom:0.7rem" onclick="abrirMusica()">🎧 Abrir no ${m.music ? 'YouTube Music' : 'YouTube'}</button>
+      <iframe style="border:0;border-radius:12px;margin-bottom:0.8rem" src="${src}" width="100%" height="200" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen loading="lazy"></iframe>`;
+    note.textContent = 'O player toca aqui dentro enquanto a tela estiver ligada (o treino mantém a tela ligada). Se aparecer erro no player, use o botão Abrir.';
+  } else {
+    box.innerHTML = `<button class="btn btn-teal" style="width:100%;margin-bottom:0.5rem" onclick="abrirMusica()">🎧 Abrir no Spotify</button>
+      <button class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:0.8rem" onclick="mostrarSpotify()">Mostrar player aqui</button>
+      <div id="mu-embed"></div>`;
+    note.textContent = 'Para tocar a música inteira, abra no app do Spotify, dê play e volte ao FitFlow: ela continua tocando. O player daqui costuma tocar só prévias de 30 segundos no celular; no PC, com Premium logado, toca inteira.';
+  }
 }
 
 // ── BOOT ───────────────────────────────────────
