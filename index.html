@@ -8,6 +8,7 @@
 <meta name="description" content="FitFlow – Seu Personal Trainer Completo">
 <title>FitFlow – Personal Trainer Completo</title>
 <link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
 <style>
 /* ═══════════════════════════════════════════════════
    FITFLOW DESIGN SYSTEM
@@ -2571,6 +2572,12 @@ window.addEventListener('DOMContentLoaded', () => {
     launch();
   }
 });
+</script>
+<script>
+// Service worker: deixa o FitFlow instalável e abrindo mesmo sem internet
+if('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
 </script>
 </body>
 </html>
