@@ -143,6 +143,12 @@ select option { background:var(--surface); }
 .uc-name { font-size:0.82rem; font-weight:600; }
 .uc-xp { font-size:0.68rem; color:var(--yellow); }
 
+/* BOTÃO DE TROCA FITFLOW ⇄ ESCOTEIRO */
+.sw-btn { position:fixed; right:0.7rem; bottom:4.9rem; z-index:150; background:linear-gradient(135deg,#3D6B4F,#2C5040);
+  color:#fff; text-decoration:none; font-weight:700; font-size:0.72rem; padding:0.55rem 0.85rem; border-radius:20px;
+  border:1.5px solid #ffffff40; box-shadow:0 4px 14px #0008; display:flex; align-items:center; gap:0.3rem; }
+.sw-btn:active { transform:scale(0.95); }
+
 /* BOTTOM NAV */
 .bottom-nav { background:var(--surface); border-top:1px solid var(--border);
   display:flex; position:fixed; bottom:0; left:0; right:0; z-index:100; }
@@ -536,6 +542,8 @@ select option { background:var(--surface); }
 
 <!-- ════════════ MAIN APP ════════════ -->
 <div id="s-app" class="screen">
+
+  <a class="sw-btn" href="../escoteiro-moderno/" title="Trocar para o Escoteiro Moderno">🏕️ Escoteiro ⇄</a>
 
   <div class="topbar">
     <div class="topbar-logo">FitFlow</div>
@@ -1031,6 +1039,35 @@ select option { background:var(--surface); }
 //  FITFLOW DATA ENGINE  v3.0
 //  localStorage persistence + health simulation + AI coach
 // ══════════════════════════════════════════════════════════
+
+// ── ECOSSISTEMA: XP/STREAK COMPARTILHADOS COM O ESCOTEIRO MODERNO ──
+// Mesma origem => mesmo localStorage. Chave única lida/escrita pelos dois apps.
+const Shared = (() => {
+  const K = 'ecossistema_shared_v1';
+  const dstr = d => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  const blank = () => ({xp:0, fitXp:0, streak:0, lastDay:null});
+  const load = () => { try { return Object.assign(blank(), JSON.parse(localStorage.getItem(K)||'{}')); } catch(e){ return blank(); } };
+  const save = s => { try { localStorage.setItem(K, JSON.stringify(s)); } catch(e){} };
+  return {
+    day: dstr,
+    addXp(n){ const s = load(); s.xp += n; save(s); },
+    setFitXp(n){ const s = load(); if(s.fitXp !== n){ s.fitXp = n; save(s); } },
+    touchDay(){
+      const s = load(), t = dstr(new Date());
+      if(s.lastDay !== t){
+        const y = new Date(); y.setDate(y.getDate()-1);
+        s.streak = s.lastDay === dstr(y) ? s.streak+1 : 1;
+        s.lastDay = t; save(s);
+      }
+    },
+    escXp(){ return load().xp || 0; },
+    totalXp(){ const s = load(); return (s.xp||0) + (s.fitXp||0); },
+    streak(){ const s = load(), y = new Date(); y.setDate(y.getDate()-1); return (s.lastDay===dstr(new Date()) || s.lastDay===dstr(y)) ? s.streak : 0; }
+  };
+})();
+// total = XP do FitFlow (U.xp) + XP ganho na Rotina da Casa (Escoteiro)
+const xpTotal = () => (U.xp||0) + Shared.escXp();
+const effStreak = () => Math.max(U.streak||0, Shared.streak());
 
 const DB = {
   save(key, val) { try { localStorage.setItem('ff_' + key, JSON.stringify(val)); } catch(e){} },
@@ -1577,13 +1614,14 @@ function populateUI() {
 
   document.getElementById('top-avatar').textContent = emo;
   document.getElementById('top-name').textContent = U.nome;
-  document.getElementById('top-xp').textContent = `⭐ ${U.xp||0} XP`;
+  Shared.setFitXp(U.xp||0);
+  document.getElementById('top-xp').textContent = `⭐ ${xpTotal()} XP`;
 
   document.getElementById('dash-hello').textContent = `${greet}, ${U.nome}! ${emo}`;
-  document.getElementById('dash-streak').textContent = U.streak || 0;
-  document.getElementById('dash-xp').textContent = (U.xp||0) + ' XP';
-  document.getElementById('dash-level').textContent = Math.floor((U.xp||0) / 500) + 1;
-  document.getElementById('dash-xp-bar').style.width = (((U.xp||0) % 500) / 500 * 100) + '%';
+  document.getElementById('dash-streak').textContent = effStreak();
+  document.getElementById('dash-xp').textContent = xpTotal() + ' XP';
+  document.getElementById('dash-level').textContent = Math.floor(xpTotal() / 500) + 1;
+  document.getElementById('dash-xp-bar').style.width = ((xpTotal() % 500) / 500 * 100) + '%';
 
   const imcV = parseFloat(U.imc);
   const imcC = imcV < 18.5 ? '#3B82F6' : imcV < 25 ? '#4ADE80' : imcV < 30 ? '#FBBF24' : '#F87171';
@@ -2081,6 +2119,7 @@ function finishWorkout() {
     U.streak = lastDay === yesterday.toDateString() ? (U.streak||0)+1 : 1;
     U.lastWorkoutDay = today;
   }
+  Shared.touchDay();
   DB.save('profile', U);
   checkAchievements();
   populateUI();
@@ -2701,9 +2740,9 @@ function checkAchievements() {
 function renderAchievements() {
   const earned = U.achievements || [];
   const totalXP = ACHIEVEMENTS.filter(a => earned.includes(a.id)).reduce((s,a) => s+a.xp, 0);
-  document.getElementById('ach-total-xp').textContent = (U.xp||0) + ' XP';
-  document.getElementById('ach-xp-bar').style.width = (((U.xp||0) % 500) / 500 * 100) + '%';
-  document.getElementById('ach-next-level').textContent = `Próximo nível: ${500 - (U.xp||0) % 500} XP`;
+  document.getElementById('ach-total-xp').textContent = xpTotal() + ' XP';
+  document.getElementById('ach-xp-bar').style.width = ((xpTotal() % 500) / 500 * 100) + '%';
+  document.getElementById('ach-next-level').textContent = `Próximo nível: ${500 - xpTotal() % 500} XP`;
 
   const grid = document.getElementById('ach-grid');
   grid.innerHTML = ACHIEVEMENTS.map(a => {
@@ -2947,6 +2986,9 @@ window.addEventListener('DOMContentLoaded', () => {
 if('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 }
+// ao voltar do Escoteiro, atualiza XP/streak compartilhados
+document.addEventListener('visibilitychange', () => { if(!document.hidden && U && U.nome) populateUI(); });
+window.addEventListener('pageshow', () => { if(U && U.nome) populateUI(); });
 </script>
 </body>
 </html>

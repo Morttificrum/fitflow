@@ -1,7 +1,7 @@
 // FitFlow service worker
 // Páginas: tenta a internet primeiro (assim as atualizações chegam) e usa o cache se estiver offline.
 // Ícones e manifesto: cache primeiro.
-const CACHE = 'fitflow-v3';
+const CACHE = 'fitflow-v4';
 const ARQUIVOS = ['./', 'index.html', 'manifest.json', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png'];
 
 self.addEventListener('install', e => {
