@@ -570,12 +570,14 @@
       <button class="btn btn-secondary" style="width:100%;margin-top:.7rem" id="sa-b-conds">🩺 Editar condições</button>
       <button class="btn btn-secondary" style="width:100%;margin-top:.5rem" id="sa-b-contact">📞 Contato e limite de frequência</button>
       ${hiddenCount() ? '<button class="btn btn-secondary" style="width:100%;margin-top:.5rem" id="sa-b-hid">👁️ Ver exercícios escondidos</button>' : ''}
+      <button class="btn btn-secondary" style="width:100%;margin-top:.5rem" id="sa-b-pausa">🌿 Pausa e Do-In: segurança (gravidez, anticoagulante)</button>
       <button class="btn btn-secondary" style="width:100%;margin-top:.5rem" id="sa-b-redo">📋 Refazer o questionário de saúde</button>
       <div class="sa-disc">${esc(DISCLAIMER)}</div></div>`;
     el.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { S.adaptMode = b.dataset.m; save(); afterChange(); });
     el.querySelectorAll('[data-z]').forEach(b => b.onclick = () => { S.acc.size = +b.dataset.z; save(); applyUI(); renderProfileCard(); });
     $('sa-hc-chk').onchange = e => { S.acc.contrast = e.target.checked; save(); applyUI(); };
     $('sa-b-conds').onclick = modalConds; $('sa-b-contact').onclick = modalContact; $('sa-b-redo').onclick = () => startTriage(true);
+    const pb = $('sa-b-pausa'); if (pb) pb.onclick = () => window.Pausa && Pausa.perguntarPerfil(() => Pausa.menu(), true);
     const h = $('sa-b-hid'); if (h) h.onclick = modalHidden;
   }
 
@@ -671,6 +673,7 @@
     if (hcPoll) clearInterval(hcPoll); hcPoll = setInterval(hcLiveTick, 15000);
     if (window.Dados) { Dados.montar(); Dados.sync(); }
     if (window.Medicoes) Medicoes.montar();
+    if (window.Pausa) Pausa.montar();
     if (needTriage()) startTriage(false);
     else if (blocked() && false) modalGate();
   };

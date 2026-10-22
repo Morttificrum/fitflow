@@ -149,3 +149,45 @@ html.acc-2 .uc-name, html.acc-2 .sa-sw .lbl { display:none; }
 .bottom-nav { padding-bottom:env(safe-area-inset-bottom, 0px); }
 /* aviso (toast) sobe para cima do menu: nunca cobre a barra de socorro do topo */
 .notif { top:auto !important; bottom:calc(var(--navh, 56px) + 4.5rem); }
+
+/* ── Pausa anti-estresse e Do-In ── */
+.sa-pausa-bar { flex:1 1 100%; background:linear-gradient(135deg,#0f766e,#14b8a6); color:#fff; border:2px solid #ffffff66; font-weight:700; }
+.pa-rapidas { display:grid; grid-template-columns:repeat(3,1fr); gap:0.5rem; margin:0.6rem 0; }
+.pa-rapidas .sa-btn { margin:0; font-size:1.2rem; }
+.pa-grupo { background:var(--card); border:1.5px solid var(--border); border-radius:var(--r-md); padding:0.6rem 0.8rem; margin:0.5rem 0; }
+.pa-grupo summary { cursor:pointer; padding:0.4rem 0; font-size:0.95rem; }
+.pa-rodape { margin-top:0.8rem; }
+.pa-sessao { align-items:flex-start; }
+.pa-tela .sa-box { padding:0.8rem 0.8rem 1rem; min-height:92vh; display:flex; flex-direction:column; }
+.pa-run { display:flex; flex-direction:column; flex:1; gap:0.6rem; }
+.pa-top { display:flex; align-items:center; gap:0.6rem; }
+.pa-peq { width:auto; margin:0 !important; padding:0.5rem 0.9rem; min-height:2.8rem; font-size:0.9rem; }
+.pa-cena { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:0.6rem; padding:0.5rem; min-height:50vh; }
+.pa-circ { width:min(70vw,260px); height:min(70vw,260px); display:flex; align-items:center; justify-content:center; }
+.pa-bola { width:100%; height:100%; border-radius:50%; background:radial-gradient(circle at 35% 30%, #5eead4, #0f766e); transform:scale(0.45); box-shadow:0 0 40px #14b8a688; }
+.pa-fase { font-family:'Bebas Neue',sans-serif; font-size:2.4rem; letter-spacing:2px; color:var(--teal); }
+.pa-cont { font-size:1.1rem; color:var(--muted2); }
+.pa-emoji { font-size:4.5rem; line-height:1; }
+.pa-titulo { font-size:1.35rem; font-weight:700; }
+.pa-texto { font-size:1rem; line-height:1.6; max-width:34rem; text-align:left; }
+.pa-figwrap { width:min(60vw,220px); color:var(--muted2); }
+.pt-fig { width:100%; height:auto; }
+.pt-lbl { fill:var(--muted2); font-size:8px; stroke:none; }
+.pt-dot { fill:var(--orange); stroke:none; }
+.pt-halo { fill:none; stroke:var(--orange); stroke-width:2; transform-box:fill-box; transform-origin:center; animation:ptPulse 1.6s ease-out infinite; }
+@keyframes ptPulse { 0% { transform:scale(1); opacity:.9 } 100% { transform:scale(3.2); opacity:0 } }
+@media (prefers-reduced-motion: reduce) { .pt-halo { animation:none; opacity:.6; transform:scale(2); } }
+.pa-pressao { background:var(--card2); border-radius:10px; padding:0.4rem 0.8rem; font-size:0.9rem; }
+.pa-p-leve { border-left:4px solid var(--green); }
+.pa-p-firme { border-left:4px solid var(--yellow); }
+.pa-lado { color:var(--teal); font-weight:700; min-height:1.2rem; }
+.pa-ctl { display:flex; gap:0.6rem; justify-content:center; }
+.pa-avisos { border-top:1px solid var(--border); padding-top:0.5rem; }
+.pa-rotulo-peq { color:var(--muted2); }
+.pa-nota button { color:#08081A; }
+.pa-nota button.sel { outline:3px solid #fff; transform:scale(1.08); }
+.pa-duas { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; }
+html.acc-1 .pa-texto, html.acc-2 .pa-texto { font-size:1.1rem; }
+html.acc-2 .pa-circ { width:min(60vw,220px); height:min(60vw,220px); }
+
+body.pa-aberta .notif { display:none !important; }
