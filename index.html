@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0D0D1A">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="description" content="FitFlow – Seu Personal Trainer Completo">
@@ -592,34 +592,10 @@ select option { background:var(--surface); }
       <div id="dash-checkin-wrap"></div>
       <div id="dash-coach-wrap"></div>
 
-      <!-- Saúde do dia (smartwatch) -->
+      <!-- Saúde do dia: só dados reais, cada valor com a sua fonte -->
       <div class="card">
-        <div class="card-header"><span class="card-title">⌚ Saúde de Hoje</span><span class="badge badge-b" id="h-src">Simulado</span></div>
-        <div class="health-grid" style="margin:0">
-          <div class="health-card">
-            <div class="hc-icon">❤️</div>
-            <div class="hc-val" id="h-bpm" style="color:var(--red)">– bpm</div>
-            <div class="hc-lbl">Freq. Cardíaca</div>
-          </div>
-          <div class="health-card">
-            <div class="hc-icon">🚶</div>
-            <div class="hc-val" id="h-steps" style="color:var(--green)">–</div>
-            <div class="hc-lbl">Passos</div>
-            <div class="pbar-wrap thin" style="margin-top:0.4rem">
-              <div class="pbar" id="h-steps-bar" style="width:0%;background:var(--green)"></div>
-            </div>
-          </div>
-          <div class="health-card">
-            <div class="hc-icon">😴</div>
-            <div class="hc-val" id="h-sleep" style="color:var(--purple)">–h</div>
-            <div class="hc-lbl">Sono</div>
-          </div>
-          <div class="health-card">
-            <div class="hc-icon">🫁</div>
-            <div class="hc-val" id="h-spo2" style="color:var(--blue)">–%</div>
-            <div class="hc-lbl">SpO₂</div>
-          </div>
-        </div>
+        <div class="card-header"><span class="card-title">⌚ Saúde de Hoje</span></div>
+        <div class="health-grid" id="h-grid" style="margin:0"></div>
       </div>
 
       <!-- Água hoje -->
@@ -814,38 +790,15 @@ select option { background:var(--surface); }
       </div>
 
       <!-- Hoje -->
-      <div class="h2" style="display:flex;align-items:center;justify-content:space-between">📊 Hoje <span class="badge badge-b" id="s-src">Simulado</span></div>
-      <div class="health-grid">
-        <div class="health-card"><div class="hc-icon">❤️</div><div class="hc-val" id="s-bpm" style="color:var(--red)">–</div><div class="hc-lbl">BPM Repouso</div></div>
-        <div class="health-card"><div class="hc-icon">⚡</div><div class="hc-val" id="s-bpmpico" style="color:var(--orange)">–</div><div class="hc-lbl">BPM Pico</div></div>
-        <div class="health-card"><div class="hc-icon">🚶</div><div class="hc-val" id="s-steps" style="color:var(--green)">–</div><div class="hc-lbl">Passos</div></div>
-        <div class="health-card"><div class="hc-icon">🔥</div><div class="hc-val" id="s-kcal" style="color:var(--orange)">–</div><div class="hc-lbl">Kcal Queimadas</div></div>
-        <div class="health-card"><div class="hc-icon">😴</div><div class="hc-val" id="s-sleep" style="color:var(--purple)">–h</div><div class="hc-lbl">Sono Ontem</div></div>
-        <div class="health-card"><div class="hc-icon">🫁</div><div class="hc-val" id="s-spo2" style="color:var(--blue)">–%</div><div class="hc-lbl">SpO₂</div></div>
-        <div class="health-card"><div class="hc-icon">🧠</div><div class="hc-val" id="s-stress" style="color:var(--yellow)">–</div><div class="hc-lbl">Stress</div></div>
-        <div class="health-card"><div class="hc-icon">⏱️</div><div class="hc-val" id="s-ativo" style="color:var(--teal)">–min</div><div class="hc-lbl">Tempo Ativo</div></div>
-      </div>
+      <div class="h2">📊 Hoje</div>
+      <div class="health-grid" id="s-grid"></div>
 
-      <!-- Sono detalhado -->
-      <div class="h2">😴 Análise do Sono</div>
-      <div class="card">
-        <div class="card-header">
-          <span class="card-title">Qualidade do Sono</span>
-          <span class="badge badge-p" id="sleep-qual">–</span>
-        </div>
-        <div class="sleep-bar" id="sleep-bar">
-          <div class="sleep-phase" style="width:15%;background:#3B82F680;color:#93C5FD">Leve</div>
-          <div class="sleep-phase" style="width:50%;background:#A78BFA80;color:#C4B5FD">Profundo</div>
-          <div class="sleep-phase" style="width:25%;background:#F472B680;color:#FBCFE8">REM</div>
-          <div class="sleep-phase" style="width:10%;background:#64748B80;color:#CBD5E1">Acordado</div>
-        </div>
-        <div class="tip tip-purple" style="margin:0.5rem 0 0">
-          💡 Durma entre <strong>22h–23h</strong> para maximizar GH (hormônio do crescimento) e queima de gordura. Meta: <strong>7–9h</strong> por noite.
-        </div>
-      </div>
+      <!-- Sono -->
+      <div class="h2">😴 Sono</div>
+      <div id="sleep-card" class="card"></div>
 
       <!-- Semana -->
-      <div class="h2" style="display:flex;align-items:center;justify-content:space-between">📅 Esta Semana <span class="badge badge-b" id="w-src">Simulado</span></div>
+      <div class="h2">📅 Esta Semana</div>
       <div class="card">
         <div class="card-title" style="margin-bottom:0.8rem">Passos Diários</div>
         <div id="steps-chart"></div>
@@ -856,18 +809,16 @@ select option { background:var(--surface); }
       </div>
 
       <!-- Dados do relógio (manual) -->
-      <div class="h2">📝 Dados do Relógio</div>
+      <div class="h2">📝 Digitar dados (opcional)</div>
       <div class="card">
-        <div class="small muted" style="line-height:1.6;margin-bottom:0.8rem">Abra o app do seu relógio (Samsung Health, Zepp, Garmin Connect, Saúde do iPhone…) e digite os números de hoje. Assim que você salvar, os dados simulados saem e entram os seus.</div>
+        <div class="small muted" style="line-height:1.6;margin-bottom:0.8rem">Se preferir, digite os números de hoje. Eles aparecem como <strong>Digitado</strong>; se o celular ou o relógio tiverem o dado, eles têm prioridade. </div>
         <div class="form-grid">
           <div class="field"><label>Passos</label><input id="hl-passos" type="number" inputmode="numeric" placeholder="8500"></div>
           <div class="field"><label>Sono (h)</label><input id="hl-sono" type="number" inputmode="decimal" step="0.1" placeholder="7.5"></div>
           <div class="field"><label>BPM repouso</label><input id="hl-bpm" type="number" inputmode="numeric" placeholder="64"></div>
           <div class="field"><label>BPM máx.</label><input id="hl-pico" type="number" inputmode="numeric" placeholder="148"></div>
-          <div class="field"><label>SpO₂ (%)</label><input id="hl-spo2" type="number" inputmode="numeric" placeholder="97"></div>
           <div class="field"><label>Kcal do dia</label><input id="hl-kcal" type="number" inputmode="numeric" placeholder="2100"></div>
           <div class="field"><label>Min. ativos</label><input id="hl-ativo" type="number" inputmode="numeric" placeholder="45"></div>
-          <div class="field"><label>Stress (0-100)</label><input id="hl-stress" type="number" inputmode="numeric" placeholder="30"></div>
         </div>
         <button class="btn btn-primary" onclick="saveHealthLog()">💾 Salvar dados de hoje</button>
       </div>
@@ -1033,7 +984,7 @@ select option { background:var(--surface); }
 <script>
 // ══════════════════════════════════════════════════════════
 //  FITFLOW DATA ENGINE  v3.0
-//  localStorage persistence + health simulation + AI coach
+//  localStorage persistence + dados reais de saúde + AI coach
 // ══════════════════════════════════════════════════════════
 
 // ── ECOSSISTEMA: XP/STREAK COMPARTILHADOS COM O ESCOTEIRO MODERNO ──
@@ -1098,7 +1049,7 @@ const EX = {
     {id:'c02',name:'Corrida no Lugar',icon:'🏃',sets:'3min',dur:180,kcal:35,target:[],level:'todos',muscles:'Cardio Geral'},
     {id:'c03',name:'Burpee',icon:'💥',sets:'3x10',dur:60,kcal:15,target:[],level:'intermediario',muscles:'Full Body Explosivo'},
     {id:'c04',name:'Mountain Climber',icon:'🧗',sets:'3x20',dur:45,kcal:10,target:['abdomen'],level:'todos',muscles:'Core + Cardio'},
-    {id:'c05',name:'Pular Corda (simulado)',icon:'🪢',sets:'3min',dur:180,kcal:40,target:[],level:'todos',muscles:'Cardio + Coordenação'},
+    {id:'c05',name:'Pular Corda (sem corda)',icon:'🪢',sets:'3min',dur:180,kcal:40,target:[],level:'todos',muscles:'Cardio + Coordenação'},
     {id:'c06',name:'Skipping Alto',icon:'🦿',sets:'3x30s',dur:30,kcal:12,target:[],level:'todos',muscles:'Cardio Intenso'},
     {id:'c07',name:'Lateral Shuffle',icon:'🔀',sets:'3x30s',dur:30,kcal:8,target:['pernas'],level:'todos',muscles:'Agilidade Lateral'},
     {id:'c08',name:'Box Step',icon:'📦',sets:'3min',dur:180,kcal:25,target:['pernas'],level:'todos',muscles:'Resistência'},
@@ -1402,33 +1353,6 @@ function getCoachAdvice(user, history) {
 function goalLabel(g) {
   return {perder_peso:'Perder Peso',perder_gordura:'Queimar Gordura',ganhar_massa:'Ganhar Massa',
     definir:'Definir o Corpo',saude:'Saúde Geral',flexibilidade:'Flexibilidade'}[g] || g;
-}
-
-// ── HEALTH SIMULATION (simula dados de smartwatch / Google Fit) ──
-function getHealthData(dia) {
-  const base = {
-    bpm_repouso: 65 + Math.round(Math.random() * 15),
-    bpm_pico: 140 + Math.round(Math.random() * 30),
-    passos: 6000 + Math.round(Math.random() * 6000),
-    calorias_dia: 1800 + Math.round(Math.random() * 600),
-    sono_horas: 6 + Math.round(Math.random() * 2 * 10) / 10,
-    sono_qualidade: ['Ruim','Regular','Boa','Ótima'][Math.floor(Math.random()*4)],
-    spo2: 96 + Math.floor(Math.random() * 4),
-    stress_level: Math.floor(Math.random() * 100),
-    ativo_minutos: 20 + Math.floor(Math.random() * 60),
-  };
-  return base;
-}
-
-function getWeekHealth() {
-  const days = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-  return days.map((d,i) => ({
-    dia: d,
-    passos: 4000 + Math.round(Math.random() * 8000),
-    sono: 5.5 + Math.round(Math.random() * 3 * 10) / 10,
-    bpm: 60 + Math.round(Math.random() * 20),
-    kcal: 1600 + Math.round(Math.random() * 800),
-  }));
 }
 
 </script>
@@ -2314,11 +2238,10 @@ function startReminderEngine() {
 }
 
 // ── HEALTH ─────────────────────────────────────
-// ── SAÚDE: fonte dos dados (simulado ou digitado do relógio) ──
-const HL_FIELDS = {passos:'hl-passos', sono_horas:'hl-sono', bpm_repouso:'hl-bpm', bpm_pico:'hl-pico',
-  spo2:'hl-spo2', calorias_dia:'hl-kcal', ativo_minutos:'hl-ativo', stress_level:'hl-stress'};
-const HL_RANGE = {passos:[0,200000], sono_horas:[0,24], bpm_repouso:[30,220], bpm_pico:[30,250],
-  spo2:[50,100], calorias_dia:[0,20000], ativo_minutos:[0,1440], stress_level:[0,100]};
+// ── SAÚDE: só dados reais (celular, relógio via Health Connect, câmera ou digitados). Nada inventado. ──
+const HL_FIELDS = {passos:'hl-passos', sono_horas:'hl-sono', bpm_repouso:'hl-bpm', bpm_pico:'hl-pico', calorias_dia:'hl-kcal', ativo_minutos:'hl-ativo'};
+const HL_RANGE = {passos:[0,200000], sono_horas:[0,24], bpm_repouso:[30,220], bpm_pico:[30,250], calorias_dia:[0,20000], ativo_minutos:[0,1440]};
+const SRC_NOME = {celular:'Celular', relogio:'Relógio (Health Connect)', digitado:'Digitado', camera:'Estimativa pela câmera'};
 
 function isoDay(d = new Date()) {
   const z = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
@@ -2326,14 +2249,12 @@ function isoDay(d = new Date()) {
 }
 
 function loadHealth() {
-  const log = DB.load('healthlog', {});
-  if(Object.keys(log).length) todayHealth = {source:'manual', ...(log[isoDay()] || {})};
-  else todayHealth = {...getHealthData(), source:'sim'};
+  const e = DB.load('healthlog', {})[isoDay()] || {};
+  todayHealth = Object.assign({}, e, {src: Object.assign({}, e.src || {})});
 }
 
 function loadWeek() {
   const log = DB.load('healthlog', {});
-  if(!Object.keys(log).length) { weekHealth = getWeekHealth(); weekHealth.src = 'sim'; return; }
   const dias = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
   weekHealth = [];
   for(let i = 6; i >= 0; i--) {
@@ -2341,7 +2262,6 @@ function loadWeek() {
     const e = log[isoDay(d)] || {};
     weekHealth.push({dia: dias[d.getDay()], passos: e.passos || 0, sono: e.sono_horas || 0});
   }
-  weekHealth.src = 'manual';
 }
 
 function saveHealthLog() {
@@ -2359,54 +2279,46 @@ function saveHealthLog() {
   }
   if(!Object.keys(entry).length) { showNotif('⚠️', 'Nada para salvar', 'Preencha pelo menos um campo.'); return; }
   const log = DB.load('healthlog', {});
-  log[isoDay()] = entry;
-  Object.keys(log).sort().slice(0, -60).forEach(k => delete log[k]);   // guarda só os últimos 60 dias
-  DB.save('healthlog', log);
+  Object.entries(entry).forEach(([k, v]) => Dados.setCampo(log, isoDay(), k, v, 'digitado', true));
+  Dados.saveLog(log);
   loadHealth(); loadWeek(); renderHealth(); checkAchievements();
   showNotif('✅', 'Dados salvos', 'Seus dados de hoje foram atualizados.');
 }
 
+function celulaSaude(icone, rotulo, k, fmt, cor) {
+  const v = todayHealth[k], tem = v !== undefined && v !== null;
+  const fonte = tem ? SRC_NOME[(todayHealth.src || {})[k] || 'digitado'] : 'Sem dados ainda';
+  return `<div class="health-card"><div class="hc-icon">${icone}</div><div class="hc-val" style="color:${cor}">${tem ? fmt(v) : '–'}</div><div class="hc-lbl">${rotulo}</div><div class="hc-src">${fonte}</div></div>`;
+}
+
 function renderHealth() {
   const d = todayHealth || {};
-  const dash = (v, suf = '') => (v === undefined || v === null) ? '–' : v + suf;
-  const steps = d.passos != null ? d.passos.toLocaleString('pt-BR') : '–';
-  const manual = d.source === 'manual';
+  const n = v => v.toLocaleString('pt-BR');
+  const grid = document.getElementById('h-grid');
+  if(grid) grid.innerHTML = celulaSaude('❤️', 'FC mínima do dia', 'bpm_repouso', v => v + ' bpm', 'var(--red)')
+    + celulaSaude('🚶', 'Passos', 'passos', n, 'var(--green)')
+    + celulaSaude('😴', 'Sono', 'sono_horas', v => v + 'h', 'var(--purple)')
+    + (d.spo2 != null ? celulaSaude('🫁', 'SpO₂', 'spo2', v => v + '%', 'var(--blue)') : '');
+  const sg = document.getElementById('s-grid');
+  if(sg) sg.innerHTML = celulaSaude('❤️', 'FC mínima do dia', 'bpm_repouso', v => v + ' bpm', 'var(--red)')
+    + celulaSaude('⚡', 'FC máxima do dia', 'bpm_pico', v => v + ' bpm', 'var(--orange)')
+    + celulaSaude('🚶', 'Passos', 'passos', n, 'var(--green)')
+    + celulaSaude('🔥', 'Kcal queimadas', 'calorias_dia', v => n(v) + ' kcal', 'var(--orange)')
+    + celulaSaude('😴', 'Sono', 'sono_horas', v => v + 'h', 'var(--purple)')
+    + (d.spo2 != null ? celulaSaude('🫁', 'SpO₂', 'spo2', v => v + '%', 'var(--blue)') : '')
+    + celulaSaude('⏱️', 'Tempo ativo', 'ativo_minutos', v => v + ' min', 'var(--teal)');
 
-  ['h-src','s-src','w-src'].forEach(id => {
-    const el = document.getElementById(id);
-    if(!el) return;
-    const isManual = id === 'w-src' ? weekHealth.src === 'manual' : manual;
-    el.textContent = isManual ? 'Seus dados' : 'Simulado';
-    el.className = 'badge ' + (isManual ? 'badge-g' : 'badge-b');
-  });
-
-  document.getElementById('h-bpm').textContent    = dash(d.bpm_repouso, ' bpm');
-  document.getElementById('h-steps').textContent  = steps;
-  document.getElementById('h-sleep').textContent  = dash(d.sono_horas, 'h');
-  document.getElementById('h-spo2').textContent   = dash(d.spo2, '%');
-  document.getElementById('h-steps-bar').style.width = d.passos != null ? Math.min(100, d.passos / 10000 * 100) + '%' : '0%';
-
-  // Painel Saúde
-  const map = {
-    bpm: dash(d.bpm_repouso, ' bpm'), bpmpico: dash(d.bpm_pico, ' bpm'),
-    steps: steps, kcal: dash(d.calorias_dia, ' kcal'),
-    sleep: dash(d.sono_horas, 'h'), spo2: dash(d.spo2, '%'),
-    stress: d.stress_level != null ? d.stress_level + '/100' : '–', ativo: dash(d.ativo_minutos, 'min'),
-  };
-  Object.entries(map).forEach(([k, v]) => { const el = document.getElementById('s-' + k); if(el) el.textContent = v; });
-
-  // A barra de fases do sono é ilustrativa, então só aparece nos dados simulados
-  document.getElementById('sleep-qual').textContent = manual ? (d.sono_horas != null ? 'Registrado' : '–') : d.sono_qualidade;
-  document.getElementById('sleep-bar').style.display = manual ? 'none' : '';
-
-  // Formulário pré-preenchido com o que já foi salvo hoje
+  // formulário: mostra só o que foi digitado
   Object.entries(HL_FIELDS).forEach(([k, id]) => {
     const el = document.getElementById(id);
-    if(el && document.activeElement !== el) el.value = manual && d[k] != null ? d[k] : '';
+    if(el && document.activeElement !== el) el.value = (d.src || {})[k] === 'digitado' && d[k] != null ? d[k] : '';
   });
 
-  renderBarChart('steps-chart', weekHealth.map(w => w.passos), weekHealth.map(w => w.dia), 'var(--green)', 10000);
-  renderBarChart('sleep-chart', weekHealth.map(w => w.sono), weekHealth.map(w => w.dia), 'var(--purple)', 9);
+  const vazio = (id, vals, msg) => { const el = document.getElementById(id); if(el && !vals.some(v => v > 0)) { el.innerHTML = '<div class="small muted">' + msg + '</div>'; return true; } return false; };
+  if(!vazio('steps-chart', weekHealth.map(w => w.passos), 'Sem dados ainda.'))
+    renderBarChart('steps-chart', weekHealth.map(w => w.passos), weekHealth.map(w => w.dia), 'var(--green)', 10000);
+  if(!vazio('sleep-chart', weekHealth.map(w => w.sono), 'Sem dados ainda.'))
+    renderBarChart('sleep-chart', weekHealth.map(w => w.sono), weekHealth.map(w => w.dia), 'var(--purple)', 9);
   renderRecentSessions();
 }
 
@@ -2725,7 +2637,7 @@ function checkAchievements() {
     { id:'streak_7',      cond: (U.streak||0) >= 7 },
     { id:'streak_30',     cond: (U.streak||0) >= 30 },
     { id:'playlist_5',    cond: (U.playlistCount||0) >= 5 },
-    { id:'steps_10k',     cond: todayHealth.source === 'manual' && todayHealth.passos >= 10000 },
+    { id:'steps_10k',     cond: (todayHealth.passos || 0) >= 10000 },
     { id:'yogi',          cond: ((U.catCount||{}).yoga||0) >= 5 },
     { id:'calist',        cond: ((U.catCount||{}).calist||0) >= 5 },
     { id:'taichi',        cond: ((U.catCount||{}).taichi||0) >= 5 },
@@ -2991,6 +2903,8 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 <script src="figuras.js"></script>
+<script src="dados.js"></script>
+<script src="medicoes.js"></script>
 <script src="saude.js"></script>
 <script>
 // Aviso: navegador de app (WhatsApp etc.) ou sem armazenamento pode perder os dados

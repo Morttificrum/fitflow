@@ -537,16 +537,6 @@
     // perfil
     const pp = $('p-perfil');
     if (pp && !$('sa-profile')) { const d = document.createElement('div'); d.id = 'sa-profile'; pp.insertBefore(d, pp.children[1] || null); }
-    // saúde: Health Connect
-    const ps = $('p-saude');
-    if (ps && NATIVE() && !$('sa-hc')) {
-      const d = document.createElement('div'); d.id = 'sa-hc'; d.className = 'card';
-      d.innerHTML = `<div class="card-header"><span class="card-title">📲 Health Connect (Android)</span></div>
-        <div class="small muted" style="line-height:1.6;margin-bottom:.6rem">Traz passos, frequência cardíaca e calorias do seu relógio/celular. Durante o treino, o app usa a frequência para avisar se passar do limite.</div>
-        <button class="btn btn-teal" style="width:100%" id="hc-btn">Conectar e sincronizar</button><div class="tiny muted" id="hc-msg" style="margin-top:.5rem"></div>`;
-      ps.insertBefore(d, ps.children[1] || null);
-      $('hc-btn').onclick = hcSync;
-    }
   }
 
   function refreshPanels() {
@@ -595,30 +585,6 @@
   const HC = () => window.Capacitor && Capacitor.Plugins && Capacitor.Plugins.Health;
   let hcOk = false, hcPoll = null;
   const dayStart = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d.toISOString(); };
-  async function hcSync() {
-    const msg = $('hc-msg'); const say_ = t => { if (msg) msg.textContent = t; };
-    try {
-      const h = HC(); if (!h) throw new Error('Health Connect indisponível neste aparelho.');
-      const av = await h.isAvailable();
-      if (!av.available) throw new Error(av.reason || 'Instale o app "Health Connect" na Play Store e tente de novo.');
-      say_('Pedindo permissão…');
-      const st = await h.requestAuthorization({ read: ['steps', 'heartRate', 'calories'], write: [] });
-      if (!st.readAuthorized || !st.readAuthorized.length) throw new Error('Permissão negada no Health Connect.');
-      hcOk = true;
-      const sum = a => a.reduce((x, y) => x + (y.value || 0), 0);
-      const q = (dataType, limit) => h.readSamples({ dataType, startDate: dayStart(), endDate: new Date().toISOString(), limit: limit || 1000 }).then(r => r.samples || []).catch(() => []);
-      const [steps, hr, kcal] = await Promise.all([q('steps', 5000), q('heartRate', 5000), q('calories', 2000)]);
-      const entry = {};
-      if (steps.length) entry.passos = Math.round(sum(steps));
-      if (hr.length) { const v = hr.map(x => x.value).filter(Boolean); entry.bpm_repouso = Math.round(Math.min(...v)); entry.bpm_pico = Math.round(Math.max(...v)); }
-      if (kcal.length) entry.calorias_dia = Math.round(sum(kcal));
-      if (!Object.keys(entry).length) { say_('Conectado, mas ainda não há dados de hoje no Health Connect.'); return; }
-      const log = DB.load('healthlog', {}); const k = isoDay();
-      log[k] = Object.assign({}, log[k] || {}, entry); DB.save('healthlog', log);
-      loadHealth(); loadWeek(); renderHealth();
-      say_('Sincronizado: ' + [entry.passos != null ? entry.passos + ' passos' : '', entry.bpm_pico ? 'FC ' + entry.bpm_repouso + '–' + entry.bpm_pico + ' bpm' : ''].filter(Boolean).join(' · '));
-    } catch (e) { say_(e.message || String(e)); }
-  }
   // durante o treino: lê a frequência mais recente do Health Connect e confere o limite
   async function hcLiveTick() {
     if (!hcOk || typeof timerRunning === 'undefined' || !timerRunning) return;
@@ -643,6 +609,8 @@
     if (blocked() && (p === 'treino' || p === 'timer')) { modalGate(); return; }
     _nav(p);
     if (p === 'perfil') renderProfileCard();
+    if (p === 'medidas' && window.Medicoes) Medicoes.render();
+    if (p !== 'medidas' && window.Medicoes) Medicoes.pararCam();
     if (p === 'timer') renderRpe();
   };
   window.levelOk = function (ex) { return _levelOk(ex) && !hidden(ex.id) && !(isAdapt() && ex.level === 'avancado'); };
@@ -700,6 +668,8 @@
     load(); rebuild(); inject(); document.body.classList.add('sa-ready');
     afterChange();
     if (hcPoll) clearInterval(hcPoll); hcPoll = setInterval(hcLiveTick, 15000);
+    if (window.Dados) { Dados.montar(); Dados.sync(); }
+    if (window.Medicoes) Medicoes.montar();
     if (needTriage()) startTriage(false);
     else if (blocked() && false) modalGate();
   };
@@ -708,7 +678,7 @@
   window.SA = {
     sos: () => modalSOS(), hiddenList: modalHidden, hidden, notesHtml, isAdapt, blocked, hrSample, state: () => S,
     figHtml: (ex, cat) => window.FIGURAS ? FIGURAS.figSVG(ex.id, cat, { label: 'Figura: ' + ex.name }) : esc(ex.icon || '🏋️'),
-    startTriage, hcSync, _test: { PARQ, COND, EXTAGS, TAG_IDS }
+    startTriage, _test: { PARQ, COND, EXTAGS, TAG_IDS }
   };
   load();
 })();
