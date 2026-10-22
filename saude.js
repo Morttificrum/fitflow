@@ -587,7 +587,8 @@
   const dayStart = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d.toISOString(); };
   // durante o treino: lê a frequência mais recente do Health Connect e confere o limite
   async function hcLiveTick() {
-    if (!hcOk || typeof timerRunning === 'undefined' || !timerRunning) return;
+    if (typeof HR !== 'undefined' && HR.connected) return;   // Bluetooth ao vivo vale mais que o Health Connect
+    if (!DB.load('hcon', false) || typeof timerRunning === 'undefined' || !timerRunning) return;
     try {
       const r = await HC().readSamples({ dataType: 'heartRate', startDate: new Date(Date.now() - 120000).toISOString(), endDate: new Date().toISOString(), limit: 10, ascending: false });
       const s = (r.samples || [])[0]; if (!s) return;
