@@ -171,7 +171,7 @@
   let tri = null;
   function startTriage(redo) {
     tri = { step: 0, ans: (redo && S.parq && S.parq.ans) ? S.parq.ans.slice() : Array(PARQ.length).fill(null),
-      conds: S.conds.slice(), contact: Object.assign({}, S.contact), hrLimit: S.hrLimit, cleared: S.cleared ? Object.assign({}, S.cleared) : { ok: false, date: '', note: '' },
+      age: age() || null, conds: S.conds.slice(), contact: Object.assign({}, S.contact), hrLimit: S.hrLimit, cleared: S.cleared ? Object.assign({}, S.cleared) : { ok: false, date: '', note: '' },
       ack: false, anySim: false };
     renderTri();
   }
@@ -202,7 +202,8 @@
       h = `${dots(2)}<div class="sa-h">Suas condições e contato de segurança</div>
       <p class="sa-p">Marque o que se aplica a você. O FitFlow esconde ou adapta os exercícios que não servem para essas condições.</p>` +
         COND_KEYS.map(k => `<label class="sa-row ${t.conds.includes(k) ? 'sel' : ''}"><input type="checkbox" data-c="${k}" ${t.conds.includes(k) ? 'checked' : ''}> <span>${COND[k].icon} <b>${esc(COND[k].label)}</b></span></label>`).join('') +
-        `<div class="sa-p" style="margin-top:1rem"><b>Contato de emergência</b> <span class="sa-small">(vai aparecer no botão "Estou passando mal")</span></div>
+        `<label class="sa-lbl" for="tri-age">Sua idade, em anos (obrigatória)</label><input class="sa-in" id="tri-age" type="number" inputmode="numeric" min="10" max="110" value="${t.age || ''}" placeholder="Ex.: 65"><div class="sa-small" id="tri-agewarn" style="color:var(--yellow)"></div>
+        <div class="sa-p" style="margin-top:1rem"><b>Contato de emergência</b> <span class="sa-small">(vai aparecer no botão "Estou passando mal")</span></div>
         <label class="sa-lbl" for="tri-cn">Nome</label><input class="sa-in" id="tri-cn" value="${esc(t.contact.name)}" placeholder="Ex.: Maria (filha)" maxlength="40" autocomplete="off">
         <label class="sa-lbl" for="tri-cp">Telefone com DDD</label><input class="sa-in" id="tri-cp" value="${esc(t.contact.phone)}" placeholder="Ex.: 11 91234-5678" inputmode="tel" maxlength="20" autocomplete="off">
         <label class="sa-lbl" for="tri-hr">Limite de frequência cardíaca, em bpm (opcional)</label>
@@ -256,13 +257,14 @@
     const cl = $('tri-cl'); if (cl) cl.onchange = () => { t.cleared.ok = cl.checked; $('tri-clbox').style.display = cl.checked ? 'block' : 'none'; cl.closest('.sa-row').classList.toggle('sel', cl.checked); };
     on('tri-back', () => { grabStep2(); t.step = Math.max(1, t.step - 1); renderTri(); });
     on('tri-next', () => {
-      if (t.step === 2) grabStep2();
+      if (t.step === 2) { grabStep2(); if (!t.age) { $('tri-agewarn').textContent = 'Informe a sua idade (de 10 a 110 anos). Ela ajusta os treinos e o limite de frequência.'; $('tri-age').focus(); return; } }
       t.step++; renderTri();
     });
     on('tri-done', finishTri);
   }
   function grabStep2() {
     const n = $('tri-cn'); if (!n) return;
+    const ag = parseInt($('tri-age').value, 10); tri.age = (ag >= 10 && ag <= 110) ? ag : null;
     tri.contact = { name: n.value.trim(), phone: $('tri-cp').value.trim() };
     const hr = parseInt($('tri-hr').value, 10); tri.hrLimit = (hr >= 60 && hr <= 220) ? hr : null;
   }
@@ -276,6 +278,7 @@
         if (!t.cleared.date) { $('tri-warn').textContent = 'Informe a data aproximada da liberação médica para continuar.'; $('tri-cd').focus(); return; }
       }
     }
+    if (t.age && typeof U !== 'undefined' && U && U.idade !== t.age) { U.idade = t.age; try { U.kcalMeta = calcKcal(U.peso, U.altura, U.idade, U.sexo, U.goal); } catch (e) {} DB.save('profile', U); }
     S.ack = true;
     S.parq = { ans: t.ans.slice(), risk: !!t.risk, date: today() };
     S.cleared = t.risk && t.cleared.ok ? { ok: true, date: t.cleared.date, note: t.cleared.note, saved: today() } : null;
@@ -480,11 +483,16 @@
     [['d-kcal', '.stat-card'], ['h-steps-bar', '.pbar-wrap'], ['nb-conquistas', null]].forEach(([id, sel]) => { const e = $(id); const t = e && (sel ? e.closest(sel) : e); if (t) t.classList.add('perf'); });
     const sf = $('dash-streak'); if (sf) { const f = sf.closest('.streak-fire'); if (f) f.classList.add('perf'); }
     document.querySelectorAll('.lvl-chip[data-l="avancado"]').forEach(b => { b.style.display = ad ? 'none' : ''; });
-    const sos = $('sa-sos'); if (sos) sos.innerHTML = ad ? '🆘 Estou passando mal' : '🆘';
+    const sos = $('sa-sos'); if (sos) sos.innerHTML = ad ? '🆘 Estou passando mal' : '🆘 Socorro';
     if (sos) sos.setAttribute('aria-label', 'Estou passando mal');
     const aa = $('sa-aa'); if (aa) aa.textContent = ['Aa', 'Aa+', 'Aa++'][S.acc.size || 0];
-    renderRpe();
+    renderRpe(); navH();
   }
+
+  // altura real da barra de baixo (cresce com a letra grande): a barra da playlist e o fim da tela se ajustam
+  function navH() { const n = document.querySelector('.bottom-nav'); if (n) document.documentElement.style.setProperty('--navh', n.offsetHeight + 'px'); }
+  window.addEventListener('resize', navH);
+  if (window.ResizeObserver) { const t = setInterval(() => { const n = document.querySelector('.bottom-nav'); if (n) { new ResizeObserver(navH).observe(n); clearInterval(t); } }, 300); }
 
   function stopStripHtml(withBtn) {
     return `<div class="sa-stop" role="note" aria-label="Sinais para parar o exercício"><b>⛔ Pare na hora se sentir:</b>
@@ -513,18 +521,18 @@
       const rpe = document.createElement('div'); rpe.id = 'sa-rpe'; rpe.className = 'sa-rpe'; rpe.style.display = 'none';
       const tb = wrap.querySelector('.timer-btns'); wrap.insertBefore(rpe, tb ? tb.nextSibling : null);
     }
-    // botão de socorro
-    if (!$('sa-sos')) {
-      const b = document.createElement('button'); b.id = 'sa-sos'; b.className = 'sa-sos'; b.type = 'button'; b.onclick = () => modalSOS();
-      document.body.appendChild(b);
-    }
-    // botão Aa na barra do topo
-    const chip = document.querySelector('.topbar .user-chip');
-    if (chip && !$('sa-aa')) {
+    // barra de ferramentas fixa no topo: socorro, tamanho da letra e troca de app (nada flutua sobre a tela)
+    const topbar = document.querySelector('.topbar');
+    if (topbar && !$('sa-bar')) {
+      const bar = document.createElement('div'); bar.id = 'sa-bar'; bar.className = 'sa-bar';
+      const sos = document.createElement('button'); sos.id = 'sa-sos'; sos.className = 'sa-sos-bar'; sos.type = 'button'; sos.onclick = () => modalSOS();
       const aa = document.createElement('button'); aa.id = 'sa-aa'; aa.className = 'sa-aa'; aa.type = 'button'; aa.setAttribute('aria-label', 'Tamanho da letra');
       aa.onclick = () => { S.acc.size = ((S.acc.size || 0) + 1) % 3; save(); applyUI(); renderProfileCard(); };
-      chip.parentNode.insertBefore(aa, chip);
-      chip.parentNode.style.gap = '0.5rem';
+      const sw = document.createElement('a'); sw.id = 'sw-btn'; sw.className = 'sa-sw'; sw.title = 'Trocar para o Escoteiro Moderno'; sw.innerHTML = '🏕️ <span class="lbl">Escoteiro</span> ⇄'; sw.setAttribute('aria-label', 'Trocar para o Escoteiro Moderno');
+      // web: link relativo; app Android (Capacitor): caminho absoluto com index.html explícito
+      sw.setAttribute('href', NATIVE() ? '/escoteiro-moderno/index.html' : '../escoteiro-moderno/');
+      bar.appendChild(sos); bar.appendChild(aa); bar.appendChild(sw);
+      topbar.appendChild(bar);
     }
     // perfil
     const pp = $('p-perfil');

@@ -144,12 +144,6 @@ select option { background:var(--surface); }
 .uc-name { font-size:0.82rem; font-weight:600; }
 .uc-xp { font-size:0.68rem; color:var(--yellow); }
 
-/* BOTÃO DE TROCA FITFLOW ⇄ ESCOTEIRO */
-.sw-btn { position:fixed; right:0.7rem; bottom:4.9rem; z-index:150; background:linear-gradient(135deg,#3D6B4F,#2C5040);
-  color:#fff; text-decoration:none; font-weight:700; font-size:0.72rem; padding:0.55rem 0.85rem; border-radius:20px;
-  border:1.5px solid #ffffff40; box-shadow:0 4px 14px #0008; display:flex; align-items:center; gap:0.3rem; }
-.sw-btn:active { transform:scale(0.95); }
-
 /* BOTTOM NAV */
 .bottom-nav { background:var(--surface); border-top:1px solid var(--border);
   display:flex; position:fixed; bottom:0; left:0; right:0; z-index:100; }
@@ -465,21 +459,23 @@ select option { background:var(--surface); }
     <div class="ob-step active" id="ob-step-1">
       <div class="ob-step-title">📋 Seus Dados</div>
       <div class="form-grid">
-        <div class="field"><label>Nome</label><input id="i-nome" type="text" placeholder="Ex: Ana"></div>
+        <div class="field"><label>Nome *</label><input id="i-nome" type="text" placeholder="Ex: Ana" autocomplete="given-name"></div>
         <div class="field"><label>Sexo</label>
           <select id="i-sexo"><option value="F">Feminino</option><option value="M">Masculino</option></select>
         </div>
-        <div class="field"><label>Idade</label><input id="i-idade" type="number" placeholder="28" min="10" max="100"></div>
-        <div class="field"><label>Altura (cm)</label><input id="i-altura" type="number" placeholder="165" min="100" max="220"></div>
-        <div class="field"><label>Peso (kg)</label><input id="i-peso" type="number" placeholder="68" min="30" max="250"></div>
-        <div class="field"><label>% Gordura</label><input id="i-gordura" type="number" placeholder="25" min="3" max="60"></div>
+        <div class="field"><label>Idade (anos) *</label><input id="i-idade" type="number" inputmode="numeric" placeholder="Ex: 65" min="10" max="110"></div>
+        <div class="field"><label>Altura (cm) *</label><input id="i-altura" type="number" inputmode="numeric" placeholder="Ex: 165" min="100" max="220"></div>
+        <div class="field"><label>Peso (kg) *</label><input id="i-peso" type="number" inputmode="decimal" placeholder="Ex: 68" min="30" max="250"></div>
+        <div class="field"><label>% Gordura (opcional)</label><input id="i-gordura" type="number" placeholder="Ex: 25" min="3" max="60"></div>
       </div>
+      <div id="ob-err" role="alert" style="display:none;color:#fff;background:#7f1020;border-radius:10px;padding:0.6rem 0.8rem;font-size:0.82rem;margin:0.2rem 0 0.6rem"></div>
+      <div class="tiny muted" style="margin-bottom:0.6rem">Os campos com * são obrigatórios: idade e altura ajustam seus treinos e a segurança do app.</div>
       <div class="section-sep">📏 Medidas Corporais</div>
       <div class="form-grid">
-        <div class="field"><label>Braço (cm)</label><input id="i-braco" type="number" placeholder="30"></div>
-        <div class="field"><label>Cintura (cm)</label><input id="i-cintura" type="number" placeholder="80"></div>
-        <div class="field"><label>Quadril (cm)</label><input id="i-quadril" type="number" placeholder="95"></div>
-        <div class="field"><label>Coxa (cm)</label><input id="i-coxa" type="number" placeholder="55"></div>
+        <div class="field"><label>Braço (cm)</label><input id="i-braco" type="number" placeholder="Ex: 30 (opcional)"></div>
+        <div class="field"><label>Cintura (cm)</label><input id="i-cintura" type="number" placeholder="Ex: 80 (opcional)"></div>
+        <div class="field"><label>Quadril (cm)</label><input id="i-quadril" type="number" placeholder="Ex: 95 (opcional)"></div>
+        <div class="field"><label>Coxa (cm)</label><input id="i-coxa" type="number" placeholder="Ex: 55 (opcional)"></div>
       </div>
       <button class="btn btn-primary" onclick="obNext(2)">Próximo →</button>
     </div>
@@ -544,7 +540,6 @@ select option { background:var(--surface); }
 <!-- ════════════ MAIN APP ════════════ -->
 <div id="s-app" class="screen">
 
-  <a class="sw-btn" href="../escoteiro-moderno/" title="Trocar para o Escoteiro Moderno">🏕️ Escoteiro ⇄</a>
 
   <div class="topbar">
     <div class="topbar-logo">FitFlow</div>
@@ -892,7 +887,7 @@ select option { background:var(--surface); }
         <div class="checkin-form">
           <div class="form-grid">
             <div class="field"><label>Peso (kg)</label><input id="ci-peso" type="number" placeholder="68"></div>
-            <div class="field"><label>% Gordura</label><input id="ci-gordura" type="number" placeholder="25"></div>
+            <div class="field"><label>% Gordura (opcional)</label><input id="ci-gordura" type="number" placeholder="25"></div>
           </div>
           <div class="form-grid">
             <div class="field"><label>Braço (cm)</label><input id="ci-braco" type="number" placeholder="30"></div>
@@ -1490,7 +1485,17 @@ const REMINDER_LIST = [
 // ── ONBOARDING ─────────────────────────────────
 let obStep = 1;
 
-function obNext(n) { setObStep(n); }
+function validaDados() {
+  const err = [], f = (id, lo, hi, nome) => { const el = document.getElementById(id); const v = parseFloat(String(el.value).replace(',', '.')); const bad = !(v >= lo && v <= hi); el.style.borderColor = bad ? 'var(--red)' : ''; if(bad) err.push(nome); return !bad; };
+  const nomeEl = document.getElementById('i-nome'); const nomeBad = !nomeEl.value.trim(); nomeEl.style.borderColor = nomeBad ? 'var(--red)' : ''; if(nomeBad) err.push('nome');
+  f('i-idade', 10, 110, 'idade (10 a 110 anos)'); f('i-altura', 100, 220, 'altura (100 a 220 cm)'); f('i-peso', 30, 250, 'peso (30 a 250 kg)');
+  const box = document.getElementById('ob-err');
+  box.style.display = err.length ? 'block' : 'none';
+  box.textContent = err.length ? 'Preencha: ' + err.join(', ') + '.' : '';
+  if(err.length) box.scrollIntoView({block:'nearest'});
+  return !err.length;
+}
+function obNext(n) { if(n > 1 && obStep === 1 && !validaDados()) return; setObStep(n); }
 function obBack(n) { setObStep(n); }
 
 function setObStep(n) {
@@ -1522,11 +1527,12 @@ document.querySelectorAll('.g-btn[data-d]').forEach(b => b.addEventListener('cli
 document.querySelectorAll('.f-btn').forEach(b => b.addEventListener('click', () => b.classList.toggle('sel')));
 
 function startApp() {
+  if(!validaDados()) { setObStep(1); return; }   // idade, altura e peso são obrigatórios
   const nome    = document.getElementById('i-nome').value.trim() || 'Atleta';
   const sexo    = document.getElementById('i-sexo').value;
-  const idade   = parseInt(document.getElementById('i-idade').value) || 28;
-  const altura  = parseFloat(document.getElementById('i-altura').value) || 168;
-  const peso    = parseFloat(document.getElementById('i-peso').value) || 70;
+  const idade   = parseInt(document.getElementById('i-idade').value);
+  const altura  = parseFloat(document.getElementById('i-altura').value);
+  const peso    = parseFloat(document.getElementById('i-peso').value);
   const gordura = parseFloat(document.getElementById('i-gordura').value) || 22;
   const braco   = document.getElementById('i-braco').value || '–';
   const cintura = document.getElementById('i-cintura').value || '–';
@@ -2986,6 +2992,25 @@ window.addEventListener('DOMContentLoaded', () => {
 </script>
 <script src="figuras.js"></script>
 <script src="saude.js"></script>
+<script>
+// Aviso: navegador de app (WhatsApp etc.) ou sem armazenamento pode perder os dados
+(function(){
+  var native = !!(window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform());
+  var standalone = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone;
+  if(native || standalone) return;
+  var ok = true; try { localStorage.setItem('_t','1'); ok = localStorage.getItem('_t') === '1'; localStorage.removeItem('_t'); } catch(e){ ok = false; }
+  try { if(navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch(e){}
+  var inApp = /WhatsApp|FBAN|FBAV|FB_IAB|Instagram|Messenger|\bLine\b|; wv\)/i.test(navigator.userAgent) || /^android-app:\/\//.test(document.referrer || '');
+  try { if(inApp) sessionStorage.setItem('inapp','1'); if(sessionStorage.getItem('inapp')) inApp = true; } catch(e){}
+  if(ok && !inApp) return;
+  window.addEventListener('DOMContentLoaded', function(){
+    var b = document.createElement('div'); b.setAttribute('role','alert');
+    b.style.cssText = 'background:#7A2E00;color:#fff;font:700 0.85rem/1.45 inherit;padding:0.7rem 0.9rem;position:relative;z-index:1000;';
+    b.innerHTML = '⚠️ ' + (ok ? 'Você abriu por um navegador de app (WhatsApp, por exemplo), que pode apagar seus dados ao fechar.' : 'Este navegador não está guardando dados.') + ' <b>Para salvar seus dados, instale o app ou abra no Chrome.</b> <span style="float:right;cursor:pointer;padding:0 4px" onclick="this.parentNode.remove()">✕</span>';
+    document.body.insertBefore(b, document.body.firstChild);
+  });
+})();
+</script>
 <script>
 // Service worker: deixa o FitFlow instalável e abrindo mesmo sem internet
 if('serviceWorker' in navigator && !window.Capacitor) {   // no app Android os arquivos já são locais

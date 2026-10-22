@@ -24,10 +24,7 @@
 .ex-more, .ex-check { flex-shrink:0; }
 .ex-adapt { flex:0 0 100%; margin-top:0.1rem; font-size:0.7rem; line-height:1.45; color:#ffd9a8; background:#ff6b3514; border-left:3px solid var(--orange); padding:0.3rem 0.5rem; border-radius:0 6px 6px 0; }
 
-/* ── botão "Estou passando mal" ─────────────────────────── */
-.sa-sos { position:fixed; left:0.7rem; bottom:4.9rem; z-index:160; background:#c0152b; color:#fff; border:2px solid #fff; border-radius:30px; padding:0.6rem 0.95rem; font:700 0.8rem/1 inherit; font-family:inherit; box-shadow:0 4px 16px #000a; cursor:pointer; display:none; }
-#s-app.active ~ .sa-sos, body.sa-ready .sa-sos { display:block; }
-.sa-sos:active { transform:scale(0.95); }
+/* ── barra fixa do topo ── */
 .sa-sos-big { width:100%; background:#c0152b; color:#fff; border:2px solid #fff; border-radius:var(--r-md); padding:1rem; font:700 1.05rem/1.2 inherit; font-family:inherit; cursor:pointer; margin:0.4rem 0 0.8rem; }
 
 /* ── janelas e triagem ──────────────────────────────────── */
@@ -114,3 +111,21 @@ html.hc :focus-visible, html.acc-1 :focus-visible, html.acc-2 :focus-visible { o
 
 /* modo adaptado: sem metas de desempenho */
 html.sa-adapt .perf { display:none !important; }
+
+/* barra de ferramentas dentro da barra do topo (nada flutua sobre a tela) */
+.topbar { flex-wrap:wrap; row-gap:0.5rem; }
+.sa-bar { flex:0 0 100%; display:flex; flex-wrap:wrap; gap:0.4rem; align-items:stretch; }
+.sa-bar > * { min-height:2.5rem; border-radius:10px; font:700 0.78rem/1.15 inherit; font-family:inherit; display:flex; align-items:center; justify-content:center; text-align:center; cursor:pointer; padding:0.35rem 0.7rem; }
+.sa-sos-bar { flex:2 1 6.5rem; background:#c0152b; color:#fff; border:2px solid #fff; }
+.sa-bar .sa-aa { flex:0 0 auto; margin:0; min-width:3rem; background:var(--card); border:1.5px solid var(--border2); color:var(--text); }
+.sa-sw { flex:1 1 5.2rem; background:linear-gradient(135deg,#3D6B4F,#2C5040); color:#fff; text-decoration:none; border:1.5px solid #ffffff55; }
+.sa-bar > *:active { transform:scale(0.96); }
+
+/* a barra da playlist e o fim do conteúdo acompanham a altura real da barra de baixo */
+.pl-bar { bottom:var(--navh,56px) !important; }
+.content { padding-bottom:calc(var(--navh,56px) + 6.5rem) !important; }
+/* letra grande: o topo deixa de ser fixo (ocupa muito espaço) e fica compacto */
+html.acc-1 .topbar, html.acc-2 .topbar { position:static; }
+html.acc-2 .topbar-logo { font-size:1.6rem; }
+html.acc-2 .uc-name, html.acc-2 .sa-sw .lbl { display:none; }
+.sa-sw .lbl { white-space:nowrap; }
