@@ -8,6 +8,7 @@
 <meta name="description" content="FitFlow – Seu Personal Trainer Completo">
 <title>FitFlow – Personal Trainer Completo</title>
 <link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="saude.css">
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>
 /* ═══════════════════════════════════════════════════
@@ -1703,16 +1704,17 @@ function renderExercises() {
       div.style.cssText = sel ? `border-color:${color}` : '';
       div.onclick = () => toggleEx(ex, cat);
       div.innerHTML = `
-        <div class="ex-icon">${ex.icon}</div>
+        <div class="ex-icon ex-fig">${window.SA ? SA.figHtml(ex, cat) : ex.icon}</div>
         <div class="ex-info">
           <div class="ex-name">${ex.name}</div>
-          <div class="ex-meta">${ex.sets} &nbsp;·&nbsp; ~${ex.kcal} kcal &nbsp;·&nbsp; ${ex.muscles}${tag}</div>
+          <div class="ex-meta">${ex.sets} &nbsp;·&nbsp; ${window.SA && SA.isAdapt() ? "" : "~" + ex.kcal + " kcal &nbsp;·&nbsp; "}${ex.muscles}${tag}</div>
           ${ex.how ? `<div class="ex-how ${openHow.has(ex.id) ? 'open' : ''}">${ex.how}</div>` : ''}
         </div>
         ${ex.how ? '<button class="ex-more" aria-label="Como fazer">i</button>' : ''}
         <div class="ex-check" style="${sel ? `background:${color};border-color:${color};color:white` : ''}">
           ${sel ? '✓' : ''}
-        </div>`;
+        </div>
+        ${window.SA ? SA.notesHtml(ex.id) : ''}`;
       const more = div.querySelector('.ex-more');
       if(more) more.onclick = e => {
         e.stopPropagation();
@@ -1781,10 +1783,11 @@ function renderSessions() {
   NEW_CATS.forEach(cat => {
     const wrap = document.getElementById('ses-' + cat);
     if(!wrap) return;
-    const list = SESSIONS.filter(x => x.cat === cat && (lvlFilter === 'all' || x.level === lvlFilter));
+    const livre = id => !(window.SA && SA.hidden(id));
+    const list = SESSIONS.filter(x => x.cat === cat && (lvlFilter === 'all' || x.level === lvlFilter) && x.ids.some(livre) && !(window.SA && SA.isAdapt() && x.level === 'avancado'));
     if(!list.length) { wrap.innerHTML = ''; return; }
     wrap.innerHTML = '<div class="section-sep" style="margin-top:0">Sessões prontas</div>' + list.map(x => {
-      const items = x.ids.map(id => EX[cat].find(e => e.id === id)).filter(Boolean);
+      const items = x.ids.filter(livre).map(id => EX[cat].find(e => e.id === id)).filter(Boolean);
       const sec = items.reduce((a,e) => a + e.dur, 0) + (items.length - 1) * CAT_INFO[cat].rest;
       return `<div class="ses">
         <div class="ses-top"><span class="ses-ico">${x.icon}</span>
@@ -1802,7 +1805,7 @@ function renderSessions() {
 function loadSession(id, start) {
   const x = SESSIONS.find(v => v.id === id);
   if(!x) return;
-  const items = x.ids.map(i => EX[x.cat].find(e => e.id === i)).filter(Boolean);
+  const items = x.ids.map(i => EX[x.cat].find(e => e.id === i)).filter(e => e && !(window.SA && SA.hidden(e.id)));
   if(start) playlist = [];
   items.forEach(ex => { if(!playlist.find(p => p.id === ex.id)) playlist.push({...ex, cat: x.cat}); });
   DB.save('playlist', playlist);
@@ -2815,7 +2818,7 @@ function editProfile() {
 
 function resetAll() {
   if(confirm('Resetar TUDO? Seus dados de progresso serão perdidos.')) {
-    ['profile','history','playlist','reminders','healthlog','sessions','lvl'].forEach(k => DB.remove(k));
+    ['profile','history','playlist','reminders','healthlog','sessions','lvl','saude'].forEach(k => DB.remove(k));
     location.reload();
   }
 }
@@ -2981,9 +2984,11 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 </script>
+<script src="figuras.js"></script>
+<script src="saude.js"></script>
 <script>
 // Service worker: deixa o FitFlow instalável e abrindo mesmo sem internet
-if('serviceWorker' in navigator) {
+if('serviceWorker' in navigator && !window.Capacitor) {   // no app Android os arquivos já são locais
   window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 }
 // ao voltar do Escoteiro, atualiza XP/streak compartilhados

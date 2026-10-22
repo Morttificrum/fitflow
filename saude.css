@@ -1,0 +1,116 @@
+/* FitFlow — Saúde Adaptada: triagem, segurança, acessibilidade */
+
+/* ── figuras dos exercícios ─────────────────────────────── */
+.ex-icon.ex-fig { width:68px; height:58px; padding:0; background:var(--card2); border-radius:10px; flex-shrink:0; overflow:hidden; display:flex; align-items:center; justify-content:center; }
+.fig { width:100%; height:100%; display:block; color:var(--teal); }
+.fig .fa { animation:figA 2s steps(1,end) infinite; }
+.fig .fb { animation:figB 2s steps(1,end) infinite; }
+.fig-still .fa { animation:none; }
+@keyframes figA { 0%,49.99% {opacity:1} 50%,100% {opacity:0} }
+@keyframes figB { 0%,49.99% {opacity:0} 50%,100% {opacity:1} }
+@media (prefers-reduced-motion: reduce) { .fig .fa, .fig .fb { animation:none; } .fig .fb { opacity:0; } }
+.t-fig { width:100%; max-width:260px; height:150px; margin:0 auto 0.6rem; background:var(--card); border:1px solid var(--border); border-radius:var(--r-md); overflow:hidden; }
+.t-fig:empty { display:none; }
+
+/* ── avisos fixos ───────────────────────────────────────── */
+.sa-stop { background:#2a0f12; border:2px solid var(--red); border-radius:var(--r-md); padding:0.7rem 0.9rem; margin:0 0 0.9rem; font-size:0.82rem; line-height:1.5; color:#ffe4e4; }
+.sa-stop b { color:#fff; }
+.sa-stop ul { margin:0.3rem 0 0.4rem 1.1rem; padding:0; }
+.sa-stop button { margin-top:0.2rem; }
+.sa-disc { font-size:0.72rem; line-height:1.5; color:var(--muted2); border-left:3px solid var(--orange); padding:0.3rem 0.7rem; margin:0.8rem 0; }
+.sa-hidden-note { font-size:0.8rem; background:var(--card); border:1px dashed var(--border2); border-radius:var(--r-md); padding:0.6rem 0.8rem; margin-bottom:0.8rem; color:var(--muted2); }
+.sa-hidden-note a { color:var(--teal); font-weight:700; cursor:pointer; text-decoration:underline; }
+.ex-item { flex-wrap:wrap; }
+.ex-more, .ex-check { flex-shrink:0; }
+.ex-adapt { flex:0 0 100%; margin-top:0.1rem; font-size:0.7rem; line-height:1.45; color:#ffd9a8; background:#ff6b3514; border-left:3px solid var(--orange); padding:0.3rem 0.5rem; border-radius:0 6px 6px 0; }
+
+/* ── botão "Estou passando mal" ─────────────────────────── */
+.sa-sos { position:fixed; left:0.7rem; bottom:4.9rem; z-index:160; background:#c0152b; color:#fff; border:2px solid #fff; border-radius:30px; padding:0.6rem 0.95rem; font:700 0.8rem/1 inherit; font-family:inherit; box-shadow:0 4px 16px #000a; cursor:pointer; display:none; }
+#s-app.active ~ .sa-sos, body.sa-ready .sa-sos { display:block; }
+.sa-sos:active { transform:scale(0.95); }
+.sa-sos-big { width:100%; background:#c0152b; color:#fff; border:2px solid #fff; border-radius:var(--r-md); padding:1rem; font:700 1.05rem/1.2 inherit; font-family:inherit; cursor:pointer; margin:0.4rem 0 0.8rem; }
+
+/* ── janelas e triagem ──────────────────────────────────── */
+.sa-ov { position:fixed; inset:0; z-index:800; background:var(--bg); overflow-y:auto; -webkit-overflow-scrolling:touch; }
+.sa-ov.modal { background:#000c; display:flex; align-items:flex-start; justify-content:center; z-index:900; padding:0.8rem; }
+.sa-box { width:100%; max-width:560px; margin:0 auto; padding:1.2rem 1rem 3rem; }
+.sa-ov.modal .sa-box { background:var(--surface); border:2px solid var(--border2); border-radius:var(--r-lg); padding:1.1rem; margin-top:0.5rem; }
+.sa-h { font-family:'Bebas Neue',sans-serif; font-size:1.9rem; letter-spacing:1.5px; color:var(--orange); line-height:1.1; margin-bottom:0.4rem; }
+.sa-p { font-size:0.92rem; line-height:1.6; color:var(--text); margin:0.5rem 0; }
+.sa-small { font-size:0.78rem; line-height:1.55; color:var(--muted2); }
+.sa-q { background:var(--card); border:1.5px solid var(--border); border-radius:var(--r-md); padding:0.9rem; margin:0.7rem 0; }
+.sa-q .t { font-size:0.95rem; line-height:1.5; margin-bottom:0.7rem; }
+.sa-q .n { color:var(--orange); font-weight:700; margin-right:0.3rem; }
+.sa-yn { display:flex; gap:0.6rem; }
+.sa-yn button { flex:1; min-height:3.2rem; border-radius:12px; border:2px solid var(--border2); background:var(--card2); color:var(--text); font:700 1.05rem/1 inherit; font-family:inherit; cursor:pointer; }
+.sa-yn button.on-no { background:#14532d; border-color:var(--green); color:#fff; }
+.sa-yn button.on-yes { background:#7c2d12; border-color:var(--orange); color:#fff; }
+.sa-btn { display:block; width:100%; min-height:3.4rem; border:none; border-radius:14px; background:linear-gradient(135deg,var(--orange),var(--orange2)); color:#fff; font:700 1.05rem/1.2 inherit; font-family:inherit; margin:0.8rem 0 0.3rem; cursor:pointer; padding:0.7rem 1rem; }
+.sa-btn.sec { background:var(--card2); border:2px solid var(--border2); color:var(--text); }
+.sa-btn.red { background:#c0152b; }
+.sa-btn.green { background:linear-gradient(135deg,#16a34a,#22c55e); }
+.sa-btn:disabled { opacity:0.4; cursor:not-allowed; }
+a.sa-btn { text-align:center; text-decoration:none; }
+.sa-row { display:flex; align-items:center; gap:0.7rem; padding:0.7rem 0.8rem; background:var(--card); border:1.5px solid var(--border); border-radius:12px; margin:0.45rem 0; cursor:pointer; font-size:0.92rem; line-height:1.4; }
+.sa-row input[type=checkbox] { width:1.6rem; height:1.6rem; flex-shrink:0; accent-color:var(--orange); }
+.sa-row.sel { border-color:var(--orange); background:#ff6b3512; }
+.sa-in { width:100%; background:var(--card2); border:2px solid var(--border2); border-radius:12px; color:var(--text); font:inherit; font-size:1rem; padding:0.75rem 0.9rem; margin:0.3rem 0 0.6rem; }
+.sa-lbl { font-size:0.8rem; color:var(--muted2); font-weight:600; display:block; margin-top:0.4rem; }
+.sa-alert { border-radius:var(--r-md); padding:0.8rem 0.9rem; margin:0.8rem 0; font-size:0.9rem; line-height:1.55; }
+.sa-alert.warn { background:#3b2306; border:2px solid var(--yellow); color:#fff3cd; }
+.sa-alert.ok { background:#0b2e1a; border:2px solid var(--green); color:#d9ffe8; }
+.sa-alert.bad { background:#3b0d12; border:2px solid var(--red); color:#ffe4e4; }
+.sa-steps { display:flex; gap:0.35rem; margin-bottom:0.8rem; }
+.sa-steps i { flex:1; height:6px; border-radius:3px; background:var(--border); }
+.sa-steps i.on { background:var(--orange); }
+.sa-tags { display:flex; flex-wrap:wrap; gap:0.35rem; margin:0.4rem 0; }
+.sa-tag { background:var(--card2); border:1px solid var(--border2); border-radius:20px; padding:0.25rem 0.7rem; font-size:0.78rem; }
+.sa-list { margin:0.3rem 0 0.3rem 1.2rem; font-size:0.9rem; line-height:1.6; }
+.sa-hr { position:fixed; left:0.7rem; right:0.7rem; top:0.7rem; z-index:950; background:#7f1020; border:2px solid #fff; border-radius:var(--r-md); padding:0.8rem 0.9rem; font-size:0.95rem; line-height:1.45; color:#fff; box-shadow:0 8px 30px #000c; }
+
+/* ── escala de esforço e teste da fala ─────────────────── */
+.sa-rpe { width:100%; background:var(--card); border:1.5px solid var(--border); border-radius:var(--r-md); padding:0.8rem; }
+.sa-rpe h4 { font-size:0.85rem; margin-bottom:0.4rem; }
+.sa-rpe-row { display:grid; grid-template-columns:repeat(11,1fr); gap:3px; margin:0.4rem 0; }
+.sa-rpe-row button { min-height:2.6rem; border:none; border-radius:8px; font:700 0.9rem/1 inherit; font-family:inherit; color:#08081A; cursor:pointer; }
+.sa-rpe-row button.sel { outline:3px solid #fff; transform:scale(1.08); }
+.sa-talk { display:flex; flex-direction:column; gap:0.35rem; margin-top:0.4rem; }
+.sa-talk button { min-height:2.8rem; border-radius:10px; border:2px solid var(--border2); background:var(--card2); color:var(--text); font:600 0.85rem/1.2 inherit; font-family:inherit; cursor:pointer; padding:0.4rem 0.7rem; text-align:left; }
+.sa-talk button.sel { border-color:var(--orange); background:#ff6b3520; }
+.sa-rpe-msg { font-size:0.85rem; line-height:1.5; margin-top:0.5rem; padding:0.5rem 0.7rem; border-radius:8px; background:var(--card2); }
+
+/* ── perfil: cartão de saúde adaptada ──────────────────── */
+.sa-card { background:var(--card); border:2px solid var(--orange); border-radius:var(--r-md); padding:1rem; margin-bottom:1rem; }
+.sa-card .row { display:flex; justify-content:space-between; gap:0.6rem; font-size:0.85rem; padding:0.3rem 0; border-bottom:1px solid var(--border); }
+.sa-card .row:last-of-type { border-bottom:none; }
+.sa-seg { display:flex; gap:0.4rem; margin:0.4rem 0; }
+.sa-seg button { flex:1; min-height:2.6rem; border-radius:10px; border:2px solid var(--border2); background:var(--card2); color:var(--text); font:600 0.85rem inherit; font-family:inherit; cursor:pointer; }
+.sa-seg button.on { border-color:var(--teal); background:#00d4aa22; color:#fff; }
+.sa-aa { background:var(--card); border:1px solid var(--border2); color:var(--text); border-radius:10px; padding:0.35rem 0.6rem; font:700 0.85rem inherit; font-family:inherit; cursor:pointer; margin-right:0.5rem; }
+
+/* ── interface acessível ───────────────────────────────── */
+html.acc-1 { font-size:118%; }
+html.acc-2 { font-size:136%; }
+html.acc-1 .btn, html.acc-2 .btn, html.acc-1 .tbtn-sm, html.acc-2 .tbtn-sm, html.acc-1 .lvl-chip, html.acc-2 .lvl-chip,
+html.acc-1 .sub-tab, html.acc-2 .sub-tab { min-height:3.1rem; }
+html.acc-1 .nav-btn, html.acc-2 .nav-btn { font-size:0.7rem; padding:0.9rem 0.5rem 0.7rem; min-width:4.6rem; }
+html.acc-1 .ex-item, html.acc-2 .ex-item { padding:1rem 0.9rem; }
+html.acc-1 .ex-name, html.acc-2 .ex-name { font-size:1.05rem; }
+html.acc-1 .ex-meta, html.acc-2 .ex-meta { font-size:0.85rem; }
+html.acc-1 .ex-check, html.acc-2 .ex-check { width:2.2rem; height:2.2rem; }
+html.acc-2 .ex-icon.ex-fig { width:76px; height:64px; }
+html.acc-1 .ex-more, html.acc-2 .ex-more { width:2.4rem; height:2.4rem; min-width:2.4rem; }
+html.acc-1 .ring-time { font-size:3.1rem; } html.acc-2 .ring-time { font-size:2.7rem; }
+html.acc-1 .ring-name, html.acc-2 .ring-name { font-size:0.7rem; }
+html.acc-1 .tbtn-lg, html.acc-2 .tbtn-lg { width:5.2rem; height:5.2rem; }
+html.hc {
+  --bg:#000; --surface:#000; --card:#0b0b0b; --card2:#161616; --border:#9ca3af; --border2:#ffffff;
+  --text:#ffffff; --muted:#e5e7eb; --muted2:#ffffff; --orange:#ffa24a; --orange2:#ffc27a;
+  --teal:#2cf5c8; --teal2:#7dffe0; --purple:#d4c4ff; --blue:#9cc9ff; --yellow:#ffe066; --green:#6bff9c; --red:#ff9a9a;
+}
+html.hc body { background:#000; }
+html.hc .card, html.hc .ex-item, html.hc .stat-card, html.hc .health-card { border-width:2px; }
+html.hc :focus-visible, html.acc-1 :focus-visible, html.acc-2 :focus-visible { outline:3px solid #ffe066; outline-offset:2px; }
+
+/* modo adaptado: sem metas de desempenho */
+html.sa-adapt .perf { display:none !important; }

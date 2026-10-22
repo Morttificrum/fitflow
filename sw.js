@@ -1,8 +1,8 @@
 // FitFlow service worker
 // Páginas: tenta a internet primeiro (assim as atualizações chegam) e usa o cache se estiver offline.
 // Ícones e manifesto: cache primeiro.
-const CACHE = 'fitflow-v4';
-const ARQUIVOS = ['./', 'index.html', 'manifest.json', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png'];
+const CACHE = 'fitflow-v5';
+const ARQUIVOS = ['./', 'index.html', 'manifest.json', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'figuras.js', 'saude.js', 'saude.css'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ARQUIVOS)).then(() => self.skipWaiting()));
