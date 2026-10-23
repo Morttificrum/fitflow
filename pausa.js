@@ -71,7 +71,7 @@
   // ════════════════════════════════════════════════════════════
   //  MENU
   // ════════════════════════════════════════════════════════════
-  const GRUPOS = [['resp', '🌬️ Respiração'], ['corpo', '🪑 Corpo na cadeira'], ['olhos', '👁️ Cansaço visual'], ['doin', '🤲 Do-In (autoaplicação)'], ['nariz', '👃 Nariz entupido / sinusite']];
+  const GRUPOS = [['resp', '🌬️ Respiração'], ['licao', '📚 Lições de respiração (uma por dia)'], ['corpo', '🪑 Corpo na cadeira'], ['olhos', '👁️ Cansaço visual'], ['doin', '🤲 Do-In (autoaplicação)'], ['nariz', '👃 Nariz entupido / sinusite']];
   function linhaSessao(s) {
     const passos = D.montarPassos(s, ctx()); const seg = D.duracaoTotal(passos); if (!passos.length) return '';
     return `<div class="sa-row pa-sessao" data-id="${s.id}" role="button" tabindex="0"><div style="font-size:1.5rem">${s.icone}</div><div style="flex:1"><b>${esc(s.titulo)}</b><div class="sa-small">${Math.max(1, Math.round(seg / 60))} min${s.tipo === 'doin' ? ' · tradicional' : ''} · ${esc(s.desc.slice(0, 80))}${s.desc.length > 80 ? '…' : ''}</div></div></div>`;
@@ -83,14 +83,26 @@
     let h = `<div class="sa-h">🌿 Preciso de uma pausa</div>
       <p class="sa-p">Escolha o tempo. Eu guio a respiração com voz e animação.</p>
       <div class="pa-rapidas">${rapida}</div>`;
-    GRUPOS.forEach(([g, nome]) => { const l = sessoes.filter(s => s.grupo === g).map(linhaSessao).join(''); if (l) h += `<details class="pa-grupo" ${g === 'doin' || g === 'resp' ? '' : ''}><summary><b>${nome}</b></summary>${l}</details>`; });
+    GRUPOS.forEach(([g, nome]) => { const l = g === 'licao' ? linhasLicoes(sessoes) : sessoes.filter(s => s.grupo === g).map(linhaSessao).join(''); if (l) h += `<details class="pa-grupo" ${g === 'doin' || g === 'resp' ? '' : ''}><summary><b>${nome}</b></summary>${l}</details>`; });
     const cs = sessoes.filter(s => s.grupo === 'cond').map(linhaSessao).join('');
     if (cs) h += `<details class="pa-grupo"><summary><b>🌿 Bem-estar para a sua condição</b></summary>${cs}</details>`;
+    if (window.Relax) h += `<button class="sa-btn pa-relax" id="pa-relax">🧘 Relaxamento guiado (3, 5, 10 e 15 min)</button>`;
     h += `<div class="pa-rodape"><button class="sa-btn sec" id="pa-hist">📊 O que funciona pra mim</button><button class="sa-btn sec" id="pa-lemb">⏰ Lembretes e sugestões</button><button class="sa-btn sec" id="pa-perfil">🛡️ Segurança do Do-In (gravidez, anticoagulante)</button></div>
       <div class="sa-alert warn pa-rotulo"><b>${esc(D.ROTULO_DOIN)}</b></div>${notaGeral}<button class="sa-btn sec" id="pa-x">Fechar</button>`;
     janela(h);
     document.querySelectorAll('#pa-ov .pa-sessao, #pa-ov .pa-rap').forEach(el => { const go = () => iniciar(el.dataset.id, el.classList.contains('pa-rap')); el.onclick = go; el.onkeydown = e => { if (e.key === 'Enter') go(); }; });
+    if ($('pa-relax')) $('pa-relax').onclick = () => Relax.menu(menu);
     $('pa-hist').onclick = historico; $('pa-lemb').onclick = lembretes; $('pa-perfil').onclick = () => perguntarPerfil(menu, true); $('pa-x').onclick = fechar;
+  }
+  const licoes = () => DB.load('licoes', { feitas: [], ultima: '' });
+  function linhasLicoes(sessoes) {
+    const L = sessoes.filter(x => x.grupo === 'licao').sort((a, b) => a.licao - b.licao), st = licoes(), feitasHoje = st.ultima === hoje();
+    const proxima = L.find(x => !st.feitas.includes(x.id));
+    return L.map(x => {
+      const feita = st.feitas.includes(x.id), liberada = feita || (x === proxima && !feitasHoje);
+      if (liberada) return linhaSessao(x).replace('class="sa-row pa-sessao"', 'class="sa-row pa-sessao' + (feita ? ' pa-feita' : '') + '"').replace('<b>', (feita ? '✅ ' : '▶ ') + '<b>');
+      return `<div class="sa-row pa-trancada" aria-disabled="true"><div style="font-size:1.5rem">🔒</div><div style="flex:1"><b>${esc(x.titulo)}</b><div class="sa-small">${x === proxima ? 'Liberada amanhã: uma lição por dia.' : 'Libera quando você concluir a anterior.'}</div></div></div>`;
+    }).join('');
   }
   function SESSOES_VISIVEIS() {
     const conds = SAs().conds || [];
@@ -204,6 +216,7 @@
     const seg = Math.round((Date.now() - r.iniMs - r.pausaMs) / 1000);
     if (!completa && r.concluidos < 1) { menu(); return; }
     let xp = 0;
+    if (completa && r.s.grupo === 'licao') { const st = licoes(); if (!st.feitas.includes(r.s.id)) st.feitas.push(r.s.id); st.ultima = hoje(); DB.save('licoes', st); }
     if (completa) { xp = r.s.xp || 10; try { if (typeof Shared !== 'undefined') { Shared.addXp(xp); Shared.touchDay(); } if (typeof populateUI === 'function') populateUI(); } catch (e) { } falar('Sessão concluída. Muito bem.'); bip(880, 0.2); }
     let depois = null;
     janela(`<div class="sa-h">${completa ? '✅ Pronto!' : 'Sessão encerrada'}</div>

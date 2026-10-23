@@ -93,6 +93,9 @@
   const PADROES = {
     coerente: { nome: 'Respiração coerente (~6 por minuto)', ciclo: [['Inspire', 5, 1], ['Expire', 5, 0]], nota: 'Inspire pelo nariz por 5 segundos e solte o ar devagar por 5 segundos, sem pausa.' },
     quadrada: { nome: 'Respiração quadrada 4-4-4-4', ciclo: [['Inspire', 4, 1], ['Segure', 4, 1], ['Expire', 4, 0], ['Pause', 4, 0]], nota: 'Inspire 4, segure 4, expire 4, pause 4. Se segurar o ar incomodar, faça sem pausas ou com pausas bem curtas.' },
+    diafragmatica: { nome: 'Respiração pela barriga (diafragmática)', ciclo: [['Inspire pelo nariz: a barriga sobe', 4, 1], ['Expire devagar: a barriga desce', 6, 0]], nota: 'Inspire 4 pelo nariz deixando a barriga subir; expire 6, devagar.' },
+    expiracao_longa: { nome: 'Expiração longa', ciclo: [['Inspire pelo nariz', 4, 1], ['Solte o ar bem devagar', 8, 0]], nota: 'Inspire 4 e solte o ar em 8, como se soprasse num canudo fino.' },
+    frenolabial: { nome: 'Lábios semicerrados (frenolabial)', ciclo: [['Inspire pelo nariz', 2, 1], ['Solte pelos lábios quase fechados', 4, 0]], nota: 'Inspire 2 pelo nariz e solte em 4 pelos lábios quase fechados, sem soprar forte.' },
     suspiro: { nome: 'Suspiro duplo', ciclo: [['Inspire', 2.5, 0.7], ['Mais um pouco', 1.5, 1], ['Solte pela boca', 5, 0]], nota: 'Duas inspirações curtas pelo nariz (uma depois da outra) e uma expiração longa pela boca, como um suspiro.' }
   };
 
@@ -142,6 +145,10 @@
       T('4. Soltar', 'Assoe o nariz com suavidade, uma narina de cada vez, sem força. Troque a solução e lave o frasco a cada uso; não compartilhe.', 20, '🤧'),
       P('yintang'), P('b2'), P('ig20'), P('e3')] }
   ];
+
+  // lições de respiração (uma por dia), a partir de relax-dados.js
+  if (window.RELAX_DADOS) window.RELAX_DADOS.LICOES.forEach(l => SESSOES.push({ id: l.id, grupo: 'licao', licao: l.n, icone: '📚', titulo: 'Lição ' + l.n + ': ' + l.titulo, min: 3, desc: l.tema + '. ' + l.porque, tipo: 'resp-licao', xp: 15,
+    passos: [T('Por que isto ajuda', l.porque, 15, '💡')].concat(l.passos.map(([t, tx, seg, pad]) => pad ? R(pad, 90) : T(t, tx, seg, '🌬️'))).concat([T('Se sentir tontura', 'Volte a respirar normalmente. Em doença respiratória ou do coração, siga a orientação do seu médico.', 10, '⚠️')]) }));
 
   // bem-estar por condição da Saúde Adaptada
   const BEM_ESTAR = {
