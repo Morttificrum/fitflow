@@ -136,6 +136,16 @@
     bentrow_u:  P(75,  [60, 200],  [0, 0],     [25, -5],   [20, -8]),
     dip_up:     P(0,   [-30, -10], [-35, -12], [75, 0],    [75, 0],  { behind: true }),
     dip_dn:     P(0,   [-30, 40],  [-35, 35],  [75, 0],    [75, 0],  { behind: true, low: 8 }),
+    pf_sit_up:  P(0,   [50, 80],   [40, 70],   [90, 0],    [90, 0],  { chair: true, ft: 40 }),
+    pf_sit_dn:  P(0,   [50, 80],   [40, 70],   [90, 0],    [90, 0],  { chair: true, ft: -40 }),
+    pf_sit_ext: P(0,   [50, 80],   [40, 70],   [90, 90],   [90, 0],  { chair: true }),
+    pf_sit_mao: P(0,   [50, 80],   [40, 70],   [90, 0],    [90, 0],  { chair: true }),
+    pf_hold:    P(0,   [55, 20],   [50, 15],   [0, 0],     [0, 0],   { apoio: true }),
+    pf_ponta:   P(0,   [55, 20],   [50, 15],   [0, 0],     [0, 0],   { apoio: true, ft: -62 }),
+    pf_calc:    P(0,   [55, 20],   [50, 15],   [0, 0],     [0, 0],   { apoio: true, ft: 38 }),
+    pf_lado:    P(0,   [55, 20],   [50, 15],   [0, 0],     [38, 38], { apoio: true }),
+    pf_tras:    P(4,   [55, 20],   [50, 15],   [0, 0],     [-38, -38], { apoio: true }),
+    pf_mini:    P(12,  [55, 20],   [50, 15],   [34, -8],   [30, -10], { apoio: true }),
     bulg_a:     P(5,   [4, 4],     [-4, -4],   [30, -5],   [-30, -85]),
     bulg_b:     P(5,   [4, 4],     [-4, -4],   [85, -5],   [-20, -85])
   };
@@ -172,10 +182,11 @@
     t11: ['sit_pull', 'sit_push'], t12: ['sit_wave_a', 'sit_wave_b'], t13: ['sit_wave_a', 'sit_wave_b'], t14: ['sit', 'stand'],
     t15: ['sit_ball', 'sit_push'], t20: ['sit_ball', 'sit_up'], t21: ['horse', 'horse'], t22: ['taichi_a', 'taichi_b'],
     t23: ['sit_up', 'stand'], t24: ['taichi_a', 'taichi_b'],
+    p01: ['pf_sit_up', 'pf_sit_dn'], p02: ['sit', 'sit_knee'], p03: ['pf_sit_mao', 'pf_sit_ext'], p04: ['sit', 'pf_sit_mao'], p05: ['sit', 'stand'], p06: ['pf_hold', 'pf_ponta'], p07: ['pf_hold', 'pf_calc'], p08: ['pf_hold', 'pf_lado'], p09: ['pf_hold', 'pf_tras'], p10: ['pf_hold', 'pf_mini'],
     h01: ['squat', 'air_squat'], h02: ['pushup_up', 'pushup_dn'], h03: ['squat_hands', 'air'], h04: ['run_a', 'run_b']
   };
   const FALLBACK = { forca: ['stand', 'squat'], cardio: ['run_a', 'run_b'], danca: ['sway_a', 'sway_b'], flexib: ['stand', 'fold'],
-    hiit: ['squat', 'air_squat'], yoga: ['stand', 'mountain'], calist: ['plank', 'pushup_dn'], taichi: ['sit', 'sit_up'] };
+    hiit: ['squat', 'air_squat'], otago: ['pf_hold', 'pf_mini'], yoga: ['stand', 'mountain'], calist: ['plank', 'pushup_dn'], taichi: ['sit', 'sit_up'] };
 
   function compute(p) {
     const hip = [0, 0];
@@ -190,7 +201,7 @@
     [pts.knN, pts.anN] = limb(hip, p.ln, L.leg1, L.leg2);
     [pts.knF, pts.anF] = limb(hip, p.lf, L.leg1, L.leg2);
     const foot = (an, a2) => [an[0] + L.foot * Math.cos(rad(a2)), an[1] - L.foot * Math.sin(rad(a2))];
-    pts.toN = foot(pts.anN, p.ln[1]); pts.toF = foot(pts.anF, p.lf[1]);
+    pts.toN = foot(pts.anN, p.ln[1] + (p.ft || 0)); pts.toF = foot(pts.anF, p.lf[1] + (p.ft || 0));
     return pts;
   }
 
@@ -215,6 +226,10 @@
     if (p.chair) {
       const sy = (+pt.hip[1] + 4).toFixed(1), hx = +pt.hip[0];
       s += `<g stroke="var(--muted2)" stroke-width="2.4">${seg([hx - 13, sy], [hx + 9, sy], 2.4)}${seg([hx - 13, sy - 30], [hx - 13, gy], 2.4)}${seg([hx + 9, sy], [hx + 9, gy], 2.4)}</g>`;
+    }
+    if (p.apoio) {
+      const hx = Math.max(+pt.haN[0], +pt.haF[0]) + 4, hy = Math.min(+pt.haN[1], +pt.haF[1]);
+      s += `<g stroke="var(--muted2)" stroke-width="2.4">${seg([hx - 6, hy], [hx + 10, hy], 2.4)}${seg([hx + 2, hy], [hx + 2, gy], 2.4)}${seg([hx + 2, gy - 22], [hx + 14, gy - 22], 2.4)}</g>`;
     }
     if (p.bar) {
       const hy = Math.min(+pt.haN[1], +pt.haF[1]) - 3, hx = +pt.haN[0];

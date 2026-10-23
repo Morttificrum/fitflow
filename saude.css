@@ -200,3 +200,10 @@ body.pa-aberta .notif { display:none !important; }
 .pa-relax { margin:0.8rem 0 0; }
 .pa-trancada { opacity:0.55; cursor:default; }
 .pa-feita { border-color:var(--green); }
+
+/* ── Pernas Fortes ── */
+.pf-fig { width:min(62vw,230px); color:var(--teal); background:var(--card2); border-radius:14px; padding:0.3rem; }
+.pf-alvo { font-size:1.05rem; background:var(--card2); border-radius:10px; padding:0.5rem 0.9rem; }
+.pf-regras ul { margin-top:0.3rem; }
+.pt-mais { font-size:1.4rem; min-height:5.5rem; margin:0.8rem 0 0.3rem; }
+.pt-conf { display:flex; align-items:center; justify-content:center; gap:1.2rem; margin:0.6rem 0; }

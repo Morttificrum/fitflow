@@ -9,7 +9,7 @@
   const $ = id => document.getElementById(id);
   const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const NATIVE = () => !!(window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform());
-  const today = () => (window.Shared ? Shared.day(new Date()) : new Date().toISOString().slice(0, 10));
+  const today = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };   // data local (não UTC)
 
   // ════════════════════════════════════════════════════════════
   //  DADOS
@@ -65,7 +65,7 @@
 
   const TAG_IDS = {
     isom: 'f10 f11 k15 k25 k21 k22 k23 k24 k13 y21 y22 y19 y17 y15',
-    isom_leve: 'k04 y04 y05 y12 t21 c10 f01 f02 f03 f15 k01 k11 k12 y23',
+    isom_leve: 'k04 y04 y05 y12 t21 c10 f01 f02 f03 f15 k01 k11 k12 y23 p03 p04 p06',
     flex: 'f12 f13 x03 y11 y18 y15 k14 k24',
     flex_leve: 'x04 x08 y03',
     torcao: 'x02 x07 y13 y16 f13',
@@ -75,9 +75,9 @@
     intenso: 'h01 h02 h03 h04 c03 c04 c06 c09 f06 k11 k21',
     inversao: 'y21 k22 y20',
     cabeca_abaixo: 'y03 y11 y18 x03 x04 y13 k12 y23',
-    equilibrio: 'y06 t07 t21 t22 t23 f07 y04 y05',
+    equilibrio: 'y06 t07 t21 t22 t23 f07 y04 y05 p06 p07 p08 p09 p10',
     equilibrio_alto: 'k10 k16 k20 y19 y22 y14 y16',
-    joelho: 'f04 f05 f07 y04 y05 y12 y18 c08 t14 k02 t21',
+    joelho: 'f04 f05 f07 y04 y05 y12 y18 c08 t14 k02 t21 p05 p10',
     joelho_alto: 'k10 k16 k20 f06 x05',
     chao: 'f08 f09 f10 f11 f12 f13 f14 f18 k01 k04 k05 k06 k14 y07 y08 y09 y17 y22 x02 x04 x05 x06 x08 x10 c10 y01 y10'
   };
@@ -674,13 +674,14 @@
     if (window.Dados) { Dados.montar(); Dados.sync(); }
     if (window.Medicoes) Medicoes.montar();
     if (window.Pausa) Pausa.montar();
+    if (window.Pernas) Pernas.montar();
     if (needTriage()) startTriage(false);
     else if (blocked() && false) modalGate();
   };
 
   // ── API pública ──
   window.SA = {
-    sos: () => modalSOS(), hiddenList: modalHidden, hidden, notesHtml, isAdapt, blocked, hrSample, state: () => S,
+    sos: () => modalSOS(), gate: () => modalGate(), preflight: go => preflight(go), hiddenList: modalHidden, hidden, notesHtml, isAdapt, blocked, hrSample, state: () => S,
     figHtml: (ex, cat) => window.FIGURAS ? FIGURAS.figSVG(ex.id, cat, { label: 'Figura: ' + ex.name }) : esc(ex.icon || '🏋️'),
     startTriage, _test: { PARQ, COND, EXTAGS, TAG_IDS }
   };
