@@ -9,6 +9,7 @@
 <title>FitFlow – Personal Trainer Completo</title>
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="saude.css">
+<script src="rotina-shared.js"></script>
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>
 /* ═══════════════════════════════════════════════════
@@ -445,6 +446,39 @@ select option { background:var(--surface); }
 @media(max-width:320px) {
   .form-grid { grid-template-columns:1fr; }
 }
+
+/* ═══ ROTINA: tela cheia, cabeçalho compacto (1 linha) e menu de baixo em 2 fileiras ═══ */
+.topbar{flex-wrap:nowrap !important;gap:6px;padding:calc(5px + env(safe-area-inset-top,0px)) 8px 5px !important;transition:transform .22s ease;}
+.topbar.rt-oculto{transform:translateY(-115%);}
+.topbar-logo{font-size:20px !important;letter-spacing:1.5px !important;line-height:1;flex:0 0 auto;}
+.user-chip{flex:1 1 0;min-width:0;overflow:hidden;padding:0 6px !important;gap:0 !important;justify-content:center;border-radius:12px !important;height:34px;}
+.user-chip .uc-avatar,.user-chip .uc-name{display:none !important;}
+.uc-xp{font-size:12px !important;font-weight:700;white-space:nowrap;}
+.sa-bar{flex:0 0 auto !important;flex-wrap:nowrap !important;gap:3px !important;align-items:center !important;}
+.sa-bar > *{min-height:34px !important;height:34px;min-width:38px;padding:0 8px !important;font-size:13px !important;flex:0 0 auto !important;border-radius:10px !important;}
+.sa-bar .lbl{display:none !important;}
+.sa-pausa-bar{order:1;}.sa-bar .sa-aa{order:2;}.sa-sw{order:3;}.sa-sos-bar{order:4;min-width:46px !important;font-size:12px !important;padding:0 6px !important;}
+html.acc-1 .topbar,html.acc-2 .topbar{position:sticky;}
+html.acc-2 .topbar-logo{font-size:17px !important;letter-spacing:1px !important;}
+html.acc-1 .sa-bar,html.acc-2 .sa-bar{gap:3px !important;}
+.sa-bar .sa-aa{min-width:36px !important;padding:0 5px !important;}
+.sa-sw{min-width:40px !important;padding:0 5px !important;}
+.bottom-nav{display:grid !important;grid-template-columns:repeat(6,minmax(0,1fr));overflow:visible !important;padding-bottom:max(env(safe-area-inset-bottom,0px),8px);}
+.nav-btn{min-width:0 !important;min-height:46px;padding:5px 1px 4px !important;font-size:10px !important;text-transform:none !important;letter-spacing:0 !important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;touch-action:manipulation;}
+.nav-btn .ni{font-size:18px !important;}
+html.acc-1 .nav-btn{font-size:10.5px !important;}html.acc-2 .nav-btn{font-size:11px !important;}
+.hc-vazio{font-size:0.62rem;color:var(--muted2);margin-top:0.2rem;line-height:1.3;font-weight:600;}
+.rt-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-md);padding:1rem;margin-bottom:1rem;}
+.rt-seg{display:grid;grid-template-columns:repeat(6,1fr);gap:0.3rem;margin:0.5rem 0;}
+.rt-seg button{min-height:2.6rem;border-radius:10px;border:2px solid var(--border2);background:var(--card2);color:var(--text);font:700 0.95rem inherit;font-family:inherit;cursor:pointer;}
+.rt-seg button.on{border-color:var(--teal);background:#00d4aa22;}
+.rt-seg button.alto.on{border-color:var(--red);background:#f8717122;}
+.rt-linha{display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;}
+.rt-in{background:var(--card2);color:var(--text);border:1.5px solid var(--border2);border-radius:10px;padding:0.4rem 0.5rem;font:600 0.9rem inherit;font-family:inherit;min-height:2.4rem;}
+.rt-chip{display:inline-block;padding:0.35rem 0.6rem;border-radius:10px;border:1.5px solid var(--border2);background:var(--card2);color:var(--muted2);font-weight:700;font-size:0.75rem;cursor:pointer;margin:0.15rem 0.2rem 0.15rem 0;}
+.rt-chip.on{background:var(--teal);color:#06231d;border-color:var(--teal);}
+.rt-aviso{background:#00d4aa14;border:1px solid var(--teal);border-radius:var(--r-md);padding:0.7rem 0.8rem;margin-bottom:0.8rem;font-size:0.85rem;line-height:1.45;}
+.rt-aviso.chuva{background:#60a5fa14;border-color:var(--blue);}.rt-aviso.calor{background:#ff6b3514;border-color:var(--orange);}
 </style>
 </head>
 <body>
@@ -603,7 +637,7 @@ select option { background:var(--surface); }
         <div class="card-header"><span class="card-title">💧 Hidratação Hoje</span></div>
         <div style="display:flex;align-items:baseline;gap:0.4rem;margin-bottom:0.5rem">
           <span style="font-size:1.5rem;font-weight:700;color:var(--teal)" id="d-agua-atual">0</span>
-          <span class="muted small" id="d-agua-meta">/ 2000 mL</span>
+          <span class="muted small" id="d-agua-meta">/ – mL</span>
         </div>
         <div class="pbar-wrap thick">
           <div class="pbar" id="d-agua-bar" style="width:0%;background:var(--teal)"></div>
@@ -764,7 +798,7 @@ select option { background:var(--surface); }
             <rect x="12" y="96"  width="46" height="2" fill="#00D4AA20" clip-path="url(#bc)"/>
           </svg>
           <div style="font-family:'Bebas Neue',sans-serif;font-size:2.8rem;color:var(--teal);letter-spacing:2px" id="w-ml">0 mL</div>
-          <div class="small muted" id="w-meta">Meta: 2000 mL</div>
+          <div class="small muted" id="w-meta">Meta: –</div>
         </div>
         <div class="glasses-row" id="glasses-row"></div>
         <div style="display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap">
@@ -813,12 +847,12 @@ select option { background:var(--surface); }
       <div class="card">
         <div class="small muted" style="line-height:1.6;margin-bottom:0.8rem">Se preferir, digite os números de hoje. Eles aparecem como <strong>Digitado</strong>; se o celular ou o relógio tiverem o dado, eles têm prioridade. </div>
         <div class="form-grid">
-          <div class="field"><label>Passos</label><input id="hl-passos" type="number" inputmode="numeric" placeholder="8500"></div>
-          <div class="field"><label>Sono (h)</label><input id="hl-sono" type="number" inputmode="decimal" step="0.1" placeholder="7.5"></div>
-          <div class="field"><label>BPM repouso</label><input id="hl-bpm" type="number" inputmode="numeric" placeholder="64"></div>
-          <div class="field"><label>BPM máx.</label><input id="hl-pico" type="number" inputmode="numeric" placeholder="148"></div>
-          <div class="field"><label>Kcal do dia</label><input id="hl-kcal" type="number" inputmode="numeric" placeholder="2100"></div>
-          <div class="field"><label>Min. ativos</label><input id="hl-ativo" type="number" inputmode="numeric" placeholder="45"></div>
+          <div class="field"><label>Passos</label><input id="hl-passos" type="number" inputmode="numeric" placeholder="–"></div>
+          <div class="field"><label>Sono (h)</label><input id="hl-sono" type="number" inputmode="decimal" step="0.1" placeholder="–"></div>
+          <div class="field"><label>BPM repouso</label><input id="hl-bpm" type="number" inputmode="numeric" placeholder="–"></div>
+          <div class="field"><label>BPM máx.</label><input id="hl-pico" type="number" inputmode="numeric" placeholder="–"></div>
+          <div class="field"><label>Kcal do dia</label><input id="hl-kcal" type="number" inputmode="numeric" placeholder="–"></div>
+          <div class="field"><label>Min. ativos</label><input id="hl-ativo" type="number" inputmode="numeric" placeholder="–"></div>
         </div>
         <button class="btn btn-primary" onclick="saveHealthLog()">💾 Salvar dados de hoje</button>
       </div>
@@ -837,20 +871,20 @@ select option { background:var(--surface); }
         <div class="card-header"><span class="card-title">📝 Check-in Semanal</span><span class="badge badge-t">Novo</span></div>
         <div class="checkin-form">
           <div class="form-grid">
-            <div class="field"><label>Peso (kg)</label><input id="ci-peso" type="number" placeholder="68"></div>
-            <div class="field"><label>% Gordura (opcional)</label><input id="ci-gordura" type="number" placeholder="25"></div>
+            <div class="field"><label>Peso (kg)</label><input id="ci-peso" type="number" placeholder="–"></div>
+            <div class="field"><label>% Gordura (opcional)</label><input id="ci-gordura" type="number" placeholder="–"></div>
           </div>
           <div class="form-grid">
-            <div class="field"><label>Braço (cm)</label><input id="ci-braco" type="number" placeholder="30"></div>
-            <div class="field"><label>Cintura (cm)</label><input id="ci-cintura" type="number" placeholder="80"></div>
-            <div class="field"><label>Quadril (cm)</label><input id="ci-quadril" type="number" placeholder="95"></div>
-            <div class="field"><label>Coxa (cm)</label><input id="ci-coxa" type="number" placeholder="55"></div>
+            <div class="field"><label>Braço (cm)</label><input id="ci-braco" type="number" placeholder="–"></div>
+            <div class="field"><label>Cintura (cm)</label><input id="ci-cintura" type="number" placeholder="–"></div>
+            <div class="field"><label>Quadril (cm)</label><input id="ci-quadril" type="number" placeholder="–"></div>
+            <div class="field"><label>Coxa (cm)</label><input id="ci-coxa" type="number" placeholder="–"></div>
           </div>
           <div class="form-grid">
-            <div class="field"><label>Treinos essa semana</label><input id="ci-treinos" type="number" placeholder="4" min="0" max="7"></div>
-            <div class="field"><label>Sono médio (h)</label><input id="ci-sono" type="number" placeholder="7.5" step="0.5"></div>
+            <div class="field"><label>Treinos essa semana</label><input id="ci-treinos" type="number" placeholder="–" min="0" max="7"></div>
+            <div class="field"><label>Sono médio (h)</label><input id="ci-sono" type="number" placeholder="–" step="0.5"></div>
           </div>
-          <div class="field"><label>Média água/dia (mL)</label><input id="ci-agua" type="number" placeholder="2000"></div>
+          <div class="field"><label>Média água/dia (mL)</label><input id="ci-agua" type="number" placeholder="–"></div>
           <div class="field"><label>Como me sinto esta semana</label>
             <select id="ci-humor">
               <option value="5">😊 Ótimo!</option>
@@ -892,7 +926,7 @@ select option { background:var(--surface); }
         <div class="xp-bar-wrap" style="margin:0.6rem 0">
           <div class="xp-bar" id="ach-xp-bar" style="width:0%"></div>
         </div>
-        <div class="small" id="ach-next-level">Próximo nível: 500 XP</div>
+        <div class="small" id="ach-next-level">Próximo nível: –</div>
       </div>
       <div class="ach-grid" id="ach-grid"></div>
     </div>
@@ -943,8 +977,8 @@ select option { background:var(--surface); }
 
   </div><!-- /content -->
 
-  <!-- BOTTOM NAV (10 items, scroll) -->
-  <div class="bottom-nav" style="overflow-x:auto;scrollbar-width:none">
+  <!-- BOTTOM NAV (11 itens em 2 fileiras de 6: todos visíveis, sem cortar) -->
+  <div class="bottom-nav">
     <button class="nav-btn active" id="nb-home"      onclick="nav('home')"      ><span class="ni">🏠</span>Início</button>
     <button class="nav-btn"        id="nb-treino"    onclick="nav('treino')"    ><span class="ni">🏋️</span>Treino</button>
     <button class="nav-btn"        id="nb-timer"     onclick="nav('timer')"     ><span class="ni">⏱️</span>Timer</button>
@@ -1483,7 +1517,7 @@ function startApp() {
   U.createdAt = new Date().toISOString();
 
   DB.save('profile', U);
-  REMINDER_LIST.forEach(r => reminderState[r.id] = true);
+  REMINDER_LIST.forEach(r => reminderState[r.id] = (r.id === 'treino'));   // água, refeição e sono: opcionais, desligados (já vêm do Google Agenda)
   DB.save('reminders', reminderState);
 
   launch();
@@ -1492,7 +1526,7 @@ function startApp() {
 function launch() {
   U = DB.load('profile', U);
   reminderState = DB.load('reminders', {});
-  REMINDER_LIST.forEach(r => { if(reminderState[r.id] === undefined) reminderState[r.id] = true; });
+  REMINDER_LIST.forEach(r => { if(reminderState[r.id] === undefined) reminderState[r.id] = (r.id === 'treino'); });
   playlist = DB.load('playlist', []);
 
   document.getElementById('s-onboarding').classList.remove('active');
@@ -2224,7 +2258,7 @@ function startReminderEngine() {
   }, 7200000);
 
   // First demo reminder
-  setTimeout(() => showNotif('💧','Hidratação',`Meta: ${(U.aguaMeta/1000).toFixed(1)}L hoje. Vamos lá! 💪`), 4000);
+  if(reminderState['agua']) setTimeout(() => showNotif('💧','Hidratação',`Meta: ${(U.aguaMeta/1000).toFixed(1)}L hoje. Vamos lá! 💪`), 4000);
 
   // Check meal times every minute
   setInterval(() => {
@@ -2241,7 +2275,13 @@ function startReminderEngine() {
 // ── SAÚDE: só dados reais (celular, relógio via Health Connect, câmera ou digitados). Nada inventado. ──
 const HL_FIELDS = {passos:'hl-passos', sono_horas:'hl-sono', bpm_repouso:'hl-bpm', bpm_pico:'hl-pico', calorias_dia:'hl-kcal', ativo_minutos:'hl-ativo'};
 const HL_RANGE = {passos:[0,200000], sono_horas:[0,24], bpm_repouso:[30,220], bpm_pico:[30,250], calorias_dia:[0,20000], ativo_minutos:[0,1440]};
-const SRC_NOME = {celular:'Celular', relogio:'Relógio (Health Connect)', digitado:'Digitado', camera:'Estimativa pela câmera'};
+const SRC_NOME = {
+  celular:'Celular', relogio:'Relógio/Cinta (Health Connect ou Bluetooth)', cinta:'Relógio/Cinta (Health Connect ou Bluetooth)', digitado:'Digitado',
+  camera:'Estimativa pela câmera',
+  est_passos:'Estimativa a partir dos passos e da altura do cadastro', est_passos_peso:'Estimativa a partir dos passos e do peso do cadastro',
+  est_cadencia:'Estimativa a partir da cadência dos passos', est_barometro:'Estimativa pelo barômetro do celular'
+};
+const PRECISA_RELOGIO = 'Precisa de relógio ou cinta';
 
 function isoDay(d = new Date()) {
   const z = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
@@ -2285,28 +2325,44 @@ function saveHealthLog() {
   showNotif('✅', 'Dados salvos', 'Seus dados de hoje foram atualizados.');
 }
 
-function celulaSaude(icone, rotulo, k, fmt, cor) {
+function celulaSaude(icone, rotulo, k, fmt, cor, vazio) {
   const v = todayHealth[k], tem = v !== undefined && v !== null;
-  const fonte = tem ? SRC_NOME[(todayHealth.src || {})[k] || 'digitado'] : 'Sem dados ainda';
-  return `<div class="health-card"><div class="hc-icon">${icone}</div><div class="hc-val" style="color:${cor}">${tem ? fmt(v) : '–'}</div><div class="hc-lbl">${rotulo}</div><div class="hc-src">${fonte}</div></div>`;
+  const fonte = tem ? (SRC_NOME[(todayHealth.src || {})[k] || 'digitado'] || 'Digitado') : (vazio || 'Sem dados ainda');
+  return `<div class="health-card"><div class="hc-icon">${icone}</div><div class="hc-val" style="color:${cor}">${tem ? fmt(v) : '–'}</div><div class="hc-lbl">${rotulo}</div><div class="${tem ? 'hc-src' : 'hc-vazio'}">${fonte}</div></div>`;
+}
+// cartão com valor já pronto (atividade agora, stress, câmera...)
+function celulaFixa(icone, rotulo, valor, fonte, cor, vazio) {
+  const tem = valor !== null && valor !== undefined && valor !== '';
+  return `<div class="health-card"><div class="hc-icon">${icone}</div><div class="hc-val" style="color:${cor}">${tem ? valor : '–'}</div><div class="hc-lbl">${rotulo}</div><div class="${tem ? 'hc-src' : 'hc-vazio'}">${tem ? fonte : (vazio || 'Sem dados ainda')}</div></div>`;
 }
 
 function renderHealth() {
   const d = todayHealth || {};
   const n = v => v.toLocaleString('pt-BR');
   const grid = document.getElementById('h-grid');
-  if(grid) grid.innerHTML = celulaSaude('❤️', 'FC mínima do dia', 'bpm_repouso', v => v + ' bpm', 'var(--red)')
-    + celulaSaude('🚶', 'Passos', 'passos', n, 'var(--green)')
+  const nf = (v, c) => v.toLocaleString('pt-BR', {maximumFractionDigits: c});
+  const aus = (typeof Extras !== 'undefined' && Extras.atividadeCelula) ? Extras.atividadeCelula() : '';
+  const barom = (typeof Extras !== 'undefined' && Extras.semBarometro && Extras.semBarometro()) ? 'Seu celular não tem barômetro' : 'Sem dados ainda';
+  if(grid) grid.innerHTML = celulaSaude('🚶', 'Passos', 'passos', n, 'var(--green)')
+    + celulaSaude('📏', 'Distância', 'distancia_km', v => nf(v, 2) + ' km', 'var(--blue)')
     + celulaSaude('😴', 'Sono', 'sono_horas', v => v + 'h', 'var(--purple)')
-    + (d.spo2 != null ? celulaSaude('🫁', 'SpO₂', 'spo2', v => v + '%', 'var(--blue)') : '');
+    + celulaSaude('❤️', 'FC mínima do dia', 'bpm_repouso', v => v + ' bpm', 'var(--red)', PRECISA_RELOGIO)
+    + celulaSaude('🫁', 'SpO₂', 'spo2', v => v + '%', 'var(--blue)', PRECISA_RELOGIO)
+    + ((typeof Extras !== 'undefined' && Extras.stressCelula) ? Extras.stressCelula() : '');
   const sg = document.getElementById('s-grid');
-  if(sg) sg.innerHTML = celulaSaude('❤️', 'FC mínima do dia', 'bpm_repouso', v => v + ' bpm', 'var(--red)')
-    + celulaSaude('⚡', 'FC máxima do dia', 'bpm_pico', v => v + ' bpm', 'var(--orange)')
-    + celulaSaude('🚶', 'Passos', 'passos', n, 'var(--green)')
+  if(sg) sg.innerHTML = celulaSaude('🚶', 'Passos', 'passos', n, 'var(--green)')
+    + celulaSaude('📏', 'Distância', 'distancia_km', v => nf(v, 2) + ' km', 'var(--blue)')
+    + celulaSaude('⏱️', 'Tempo ativo', 'ativo_minutos', v => v + ' min', 'var(--teal)')
+    + celulaSaude('🪜', 'Andares', 'andares', v => v, 'var(--yellow)', barom)
     + celulaSaude('🔥', 'Kcal queimadas', 'calorias_dia', v => n(v) + ' kcal', 'var(--orange)')
+    + aus
     + celulaSaude('😴', 'Sono', 'sono_horas', v => v + 'h', 'var(--purple)')
-    + (d.spo2 != null ? celulaSaude('🫁', 'SpO₂', 'spo2', v => v + '%', 'var(--blue)') : '')
-    + celulaSaude('⏱️', 'Tempo ativo', 'ativo_minutos', v => v + ' min', 'var(--teal)');
+    + celulaSaude('❤️', 'FC mínima do dia', 'bpm_repouso', v => v + ' bpm', 'var(--red)', PRECISA_RELOGIO)
+    + celulaSaude('⚡', 'FC máxima do dia', 'bpm_pico', v => v + ' bpm', 'var(--orange)', PRECISA_RELOGIO)
+    + celulaSaude('🫁', 'SpO₂', 'spo2', v => v + '%', 'var(--blue)', PRECISA_RELOGIO)
+    + ((typeof Extras !== 'undefined' && Extras.fcCameraCelula) ? Extras.fcCameraCelula() : '')
+    + ((typeof Extras !== 'undefined' && Extras.stressCelula) ? Extras.stressCelula() : '')
+    + celulaFixa('😰', 'Stress automático', null, '', 'var(--pink)', PRECISA_RELOGIO);
 
   // formulário: mostra só o que foi digitado
   Object.entries(HL_FIELDS).forEach(([k, id]) => {
@@ -2913,6 +2969,7 @@ window.addEventListener('DOMContentLoaded', () => {
 <script src="pernas.js"></script>
 <script src="ble.js"></script>
 <script src="saude.js"></script>
+<script src="extras.js"></script>
 <script>
 // Aviso: navegador de app (WhatsApp etc.) ou sem armazenamento pode perder os dados
 (function(){

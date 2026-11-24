@@ -96,6 +96,15 @@
   function alimentarFC(bpm) {
     if (!bpm || bpm < 25 || bpm > 250) return;
     HR.bpm = bpm; HR.source = 'ble';
+    // cinta/relógio por Bluetooth: guarda a FC mínima e máxima do dia (fonte "Relógio/Cinta")
+    try {
+      if (window.Dados && typeof isoDay === 'function') {
+        const log = Dados.getLog(), dia = isoDay(), e = log[dia] || {}; let mudou = false;
+        if (e.bpm_repouso == null || bpm < e.bpm_repouso) { Dados.setCampo(log, dia, 'bpm_repouso', bpm, 'cinta', true); mudou = true; }
+        if (e.bpm_pico == null || bpm > e.bpm_pico) { Dados.setCampo(log, dia, 'bpm_pico', bpm, 'cinta', true); mudou = true; }
+        if (mudou) { Dados.saveLog(log); if (typeof loadHealth === 'function') loadHealth(); }
+      }
+    } catch (err) { }
     if (typeof timerRunning !== 'undefined' && timerRunning && typeof wkt !== 'undefined') wkt.bpm.push(bpm);
     if (typeof updateHRLive === 'function') updateHRLive();
     if (window.SA) SA.hrSample(bpm);                       // mesmo alerta de limite do restante do app

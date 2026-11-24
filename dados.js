@@ -94,7 +94,7 @@
   // ════════════════════════════════════════════════════════════
   //  ARMAZENAMENTO
   // ════════════════════════════════════════════════════════════
-  const PRI = { digitado: 1, celular: 2, relogio: 3 };
+  const PRI = { est_passos: 0, est_passos_peso: 0, est_cadencia: 0, est_barometro: 0, digitado: 1, celular: 2, relogio: 3, cinta: 3 };
   function setCampo(log, dia, k, v, src, forcar) {
     const e = (log[dia] = log[dia] || {}); e.src = e.src || {};
     const atual = e.src[k] || (e[k] != null ? 'digitado' : null);
@@ -118,7 +118,17 @@
     const mesmaNoite = l.filter(x => x.data === dia);
     return mesmaNoite.find(x => x.fonte === 'relogio') || mesmaNoite[0];
   }
+  // Distância = passos x passada (altura x 0,415 homem / 0,413 mulher); kcal = distância x peso x 0,53 (caminhada). Sempre "estimativa".
+  function estimar(log, dia) {
+    const e = log[dia]; const u = (typeof U !== 'undefined' && U) ? U : {};
+    if (!e || !(e.passos > 0) || !(u.altura > 0)) return;
+    const passada = u.altura / 100 * (u.sexo === 'F' ? 0.413 : 0.415);
+    const km = e.passos * passada / 1000;
+    setCampo(log, dia, 'distancia_km', Math.round(km * 100) / 100, 'est_passos');
+    if (u.peso > 0) setCampo(log, dia, 'calorias_dia', Math.round(km * u.peso * 0.53), 'est_passos_peso');
+  }
   function refrescar() {
+    try { const lg = getLog(); estimar(lg, iso()); saveLog(lg); } catch (e) { /* sem perfil ainda */ }
     try { loadHealth(); loadWeek(); renderHealth(); renderSono(); renderFontes(); if (typeof checkAchievements === 'function') checkAchievements(); } catch (e) { /* tela ainda não montada */ }
   }
 
@@ -130,11 +140,26 @@
     const pl = P('Passos'); if (!pl) return;
     try {
       const r = pedir ? await pl.pedirPermissao() : await pl.hoje();
-      passosEstado = { disponivel: r.disponivel !== false, permissao: r.permissao !== false };
+      passosEstado = { disponivel: r.disponivel !== false, permissao: r.permissao !== false, barometro: !!r.barometro };
       if (r.dias) {
         const log = getLog();
         Object.keys(r.dias).forEach(d => { if (r.dias[d] > 0 || d === iso()) setCampo(log, d, 'passos', r.dias[d], 'celular'); });
+        // tempo ativo: estimativa pela cadência dos passos; andares: estimativa pelo barômetro (só se o aparelho tiver)
+        Object.keys(r.ativoDias || {}).forEach(d => { const m = Math.round(r.ativoDias[d]); if (m > 0) setCampo(log, d, 'ativo_minutos', m, 'est_cadencia'); });
+        if (r.barometro) Object.keys(r.andaresDias || {}).forEach(d => { if (r.andaresDias[d] > 0) setCampo(log, d, 'andares', r.andaresDias[d], 'est_barometro'); });
+        Object.keys(r.dias).forEach(d => estimar(log, d));
         saveLog(log);
+      }
+      // tipo de atividade agora: Activity Recognition (Play Services) ou, sem ele, estimativa pela cadência
+      const S = P('Sensores');
+      if (S && passosEstado.permissao) {
+        try {
+          const h = await S.hoje();
+          const a = h.atividade || {};
+          if (a.ligado && a.atual && a.ts > Date.now() - 15 * MIN) DB.save('atividade_agora', { tipo: a.atual, ts: a.ts, fonte: 'celular', minutos: a.minutos || {} });
+          else if (h.ultAtiv) DB.save('atividade_agora', { tipo: h.ultAtiv, ts: h.ultAtivTs, fonte: 'est_cadencia', minutos: {} });
+          if (!a.ligado) S.ativarAtividade().catch(() => { });
+        } catch (e) { /* sem sensores extras */ }
       }
     } catch (e) { passosEstado = { disponivel: true, permissao: false, erro: e.message || String(e) }; }
   }
@@ -319,12 +344,30 @@
     const v = $('son-vou'); if (v) v.onclick = explicarSono;
   }
 
+  // ── sensores do celular: o que ele mede sozinho e o que precisa de relógio/cinta ──
+  let sensoresInfo = null;
+  function carregarSensores() { if (window.Rotina && Rotina.nativo.ativo) Rotina.nativo.sensores().then(r => { sensoresInfo = r; renderFontes(); }); }
+  function sensoresHtml() {
+    const si = sensoresInfo; if (!si) return '<div class="tiny muted" style="margin-bottom:.5rem">Procurando os sensores do celular…</div>';
+    const li = (ok, t, d) => `<div style="display:flex;gap:.5rem;padding:.25rem 0;font-size:.8rem"><span>${ok ? '✅' : '➖'}</span><span><b>${t}</b><span class="muted"> — ${d}</span></span></div>`;
+    return '<div class="small" style="font-weight:700;margin:.2rem 0">📱 O que este celular mede sozinho</div>'
+      + li(si.passos, 'Passos', si.passos ? 'sensor de passos (conta também com o app fechado)' : 'este celular não tem sensor de passos')
+      + li(si.passos, 'Distância', 'passos × passada, calculada pela sua altura (estimativa)')
+      + li(si.passos, 'Tempo ativo', 'pela cadência dos passos (estimativa)')
+      + li(si.barometro, 'Andares', si.barometro ? 'barômetro (estimativa)' : 'seu celular não tem barômetro')
+      + li(si.reconhecimentoAtividade, 'Tipo de atividade', si.reconhecimentoAtividade ? 'andando, correndo, parado, veículo' : 'sem o Google Play Services: uso a cadência dos passos (estimativa)')
+      + li(si.acelerometro, 'Sono', 'acelerômetro + volume do microfone, sem gravar nada')
+      + li(true, 'Batimento pela câmera', 'aba Saúde › Medições (estimativa)')
+      + li(false, 'SpO₂, batimento contínuo e stress automático', PRECISA_RELOGIO)
+      + '<button class="btn btn-secondary btn-sm" style="width:100%;margin:.4rem 0" id="dados-perm">🔧 Permissões e bateria</button>';
+  }
   function renderFontes() {
     const el = $('dados-card'); if (!el) return;
     const ps = passosEstado;
     let h = '<div class="card-header"><span class="card-title">📲 Fontes dos dados</span></div>';
     h += '<div class="small muted" style="line-height:1.7;margin-bottom:.6rem">Cada valor mostra de onde veio: <b>Celular</b>, <b>Relógio (Health Connect)</b> ou <b>Digitado</b>. Quando há relógio, os dados dele valem mais que os do celular.</div>';
     if (NATIVE()) {
+      h += sensoresHtml();
       if (ps.disponivel === false) h += '<div class="small muted">Este celular não tem sensor de passos.</div>';
       else if (ps.permissao === false) h += '<button class="btn btn-teal" style="width:100%;margin-bottom:.5rem" id="dados-passos">🚶 Contar passos pelo celular</button><div class="tiny muted" style="margin-bottom:.5rem">O Android vai pedir a permissão de atividade física.</div>';
       else h += '<div class="small" style="margin-bottom:.5rem">🚶 Passos: contando pelo sensor do celular desde a meia-noite.</div>';
@@ -334,6 +377,7 @@
     el.className = 'card'; el.innerHTML = h;
     const b = $('dados-passos'); if (b) b.onclick = async () => { await syncPassosCelular(true); refrescar(); };
     const c = $('dados-hc'); if (c) c.onclick = conectarHC;
+    const pm = $('dados-perm'); if (pm) pm.onclick = () => Rotina.abrirPermissoes();
   }
 
   async function sync() {
@@ -347,8 +391,8 @@
     const d = document.createElement('div'); d.id = 'dados-card'; ps.insertBefore(d, ps.children[1] || null);
   }
 
-  window.Dados = { analisarSono, sync, conectarHC, syncPassosCelular, setCampo, renderSono, renderFontes, montar, refrescar, hipnograma, getLog, saveLog, getNoites, salvarNoite };
+  window.Dados = { passosEstado: () => passosEstado, estimar, carregarSensores, analisarSono, sync, conectarHC, syncPassosCelular, setCampo, renderSono, renderFontes, montar, refrescar, hipnograma, getLog, saveLog, getNoites, salvarNoite };
   // início
-  window.addEventListener('load', () => { setTimeout(() => { try { if (typeof U !== 'undefined' && U && U.nome) { montar(); sync(); } } catch (e) { } }, 600); });
+  window.addEventListener('load', () => { setTimeout(() => { try { if (typeof U !== 'undefined' && U && U.nome) { montar(); carregarSensores(); sync(); } } catch (e) { } }, 600); });
   document.addEventListener('visibilitychange', () => { if (!document.hidden && typeof U !== 'undefined' && U && U.nome) sync(); });
 })();

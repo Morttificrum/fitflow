@@ -389,7 +389,7 @@
   function montar() {
     const bar = $('sa-bar');
     if (bar && !$('pa-btn')) {
-      const b = document.createElement('button'); b.id = 'pa-btn'; b.type = 'button'; b.className = 'sa-pausa-bar'; b.innerHTML = '🌿 Preciso de uma pausa'; b.onclick = menu; bar.insertBefore(b, bar.children[1] || null);
+      const b = document.createElement('button'); b.id = 'pa-btn'; b.type = 'button'; b.className = 'sa-pausa-bar'; b.innerHTML = '🌿<span class="lbl"> Pausa</span>'; b.setAttribute('aria-label', 'Preciso de uma pausa'); b.title = 'Preciso de uma pausa'; b.onclick = menu; bar.insertBefore(b, bar.children[1] || null);
     }
     const home = $('p-home');
     if (home && !$('pa-card')) {

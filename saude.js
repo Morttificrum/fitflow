@@ -115,7 +115,9 @@
   const BLANK = () => ({ v: 1, parq: null, cleared: null, conds: [], contact: { name: '', phone: '' }, hrLimit: null,
     adaptMode: 'auto', acc: { size: 0, contrast: false }, ack: false, preDay: null, log: [] });
   let S = BLANK();
-  const load = () => { try { S = Object.assign(BLANK(), DB.load('saude', null) || {}); } catch (e) { S = BLANK(); } S.acc = Object.assign({ size: 0, contrast: false }, S.acc || {}); };
+  const load = () => { try { S = Object.assign(BLANK(), DB.load('saude', null) || {}); } catch (e) { S = BLANK(); } S.acc = Object.assign({ size: 0, contrast: false }, S.acc || {});
+    // tamanho da letra compartilhado com o Escoteiro (mesmo botão Aa nos dois apps)
+    try { const f = localStorage.getItem('rotina_fs'); if (f !== null && !isNaN(+f)) S.acc.size = +f; } catch (e) { } };
   const save = () => DB.save('saude', S);
   const logEvt = (type, extra) => { S.log = (S.log || []).concat(Object.assign({ t: new Date().toISOString(), type }, extra || {})).slice(-40); save(); };
 
@@ -483,9 +485,10 @@
     [['d-kcal', '.stat-card'], ['h-steps-bar', '.pbar-wrap'], ['nb-conquistas', null]].forEach(([id, sel]) => { const e = $(id); const t = e && (sel ? e.closest(sel) : e); if (t) t.classList.add('perf'); });
     const sf = $('dash-streak'); if (sf) { const f = sf.closest('.streak-fire'); if (f) f.classList.add('perf'); }
     document.querySelectorAll('.lvl-chip[data-l="avancado"]').forEach(b => { b.style.display = ad ? 'none' : ''; });
-    const sos = $('sa-sos'); if (sos) sos.innerHTML = ad ? '🆘 Estou passando mal' : '🆘 Socorro';
+    const sos = $('sa-sos'); if (sos) sos.innerHTML = '🆘 SOS';
     if (sos) sos.setAttribute('aria-label', 'Estou passando mal');
     const aa = $('sa-aa'); if (aa) aa.textContent = ['Aa', 'Aa+', 'Aa++'][S.acc.size || 0];
+    try { localStorage.setItem('rotina_fs', String(S.acc.size || 0)); } catch (e) { }   // o Escoteiro usa o mesmo tamanho de letra
     renderRpe(); navH();
   }
 
